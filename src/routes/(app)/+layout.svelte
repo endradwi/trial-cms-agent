@@ -85,7 +85,7 @@
   <title>Agency Ops Console — AI Virtual Headquarters</title>
 </svelte:head>
 
-<div class="h-screen w-screen overflow-hidden flex bg-[#f9f8f6] text-[#2d2b28] font-sans antialiased selection:bg-[#c9b59c] selection:text-[#2d2b28]">
+<div class="h-screen w-full overflow-hidden flex bg-[#f9f8f6] text-[#2d2b28] font-sans antialiased selection:bg-[#c9b59c] selection:text-[#2d2b28]">
   <!-- Mobile Backdrop Overlay -->
   {#if sidebarOpen}
     <!-- svelte-ignore a11y_click_events_have_key_events -->

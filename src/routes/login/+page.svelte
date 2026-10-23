@@ -11,7 +11,7 @@
   <title>Restricted Access — Agency Ops Virtual HQ</title>
 </svelte:head>
 
-<div class="min-h-screen w-screen flex items-center justify-center p-4 bg-[#f9f8f6] font-sans antialiased text-[#2d2b28]">
+<div class="min-h-screen w-full flex items-center justify-center p-4 bg-[#f9f8f6] font-sans antialiased text-[#2d2b28]">
   <div class="w-full max-w-sm">
     <div class="bg-[#ffffff] border border-[#d9cfc7] rounded-2xl p-6 sm:p-7 shadow-sm">
       <div class="flex items-center justify-between mb-5">
