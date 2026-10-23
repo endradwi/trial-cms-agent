@@ -26,6 +26,14 @@ const CHANNEL_TARGETS: Array<{ slug: string; handle: string; url: string }> = [
   { slug: 'optionmarket', handle: '@optionmarket5', url: 'https://www.youtube.com/@optionmarket-l6o/shorts' }
 ];
 
+function cleanTitle(str: string): string {
+  if (!str) return '';
+  return str
+    .replace(/[\uFE00-\uFE0F]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim();
+}
+
 function parseViewsString(str: string): number {
   if (!str) return 0;
   const clean = str.toLowerCase().replace('views', '').replace('view', '').trim();
@@ -70,7 +78,7 @@ export async function fetchLiveViewsFromYouTube(): Promise<Record<string, Channe
           const vm = it?.richItemRenderer?.content?.shortsLockupViewModel;
           if (vm) {
             const vidId = vm?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId;
-            const title = vm?.overlayMetadata?.primaryText?.content || '';
+            const title = cleanTitle(vm?.overlayMetadata?.primaryText?.content || '');
             const views = vm?.overlayMetadata?.secondaryText?.content || '';
             if (vidId) {
               vids.push({ id: vidId, title, views });
