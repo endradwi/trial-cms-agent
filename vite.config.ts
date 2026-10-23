@@ -5,7 +5,10 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [
 		sveltekit({
-			adapter: adapter()
+			adapter: adapter(),
+			csrf: {
+				trustedOrigins: ['*']
+			}
 		})
 	],
 	server: {
