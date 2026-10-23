@@ -109,7 +109,8 @@
         category: ch.category,
         bounty: ch.bounty_platform || 'Internal',
         views,
-        viewsText: stat?.latestViewsText || (views > 0 ? `${views.toLocaleString('id-ID')} views` : 'Pending Index'),
+        viewsText: views > 0 ? `${views.toLocaleString('id-ID')} views` : 'Pending Index',
+        latestViewsText: stat?.latestViewsText,
         latestVideo: stat?.latestVideo
       };
     });
@@ -560,8 +561,13 @@
             </div>
 
             {#if item.latestVideo}
-              <div class="mt-2 text-[11px] text-[#7a756f] truncate">
-                <span class="font-semibold text-[#2d2b28]">Terbaru:</span> {item.latestVideo.title}
+              <div class="mt-2 text-[11px] text-[#7a756f] flex items-center justify-between gap-2">
+                <span class="truncate"><span class="font-semibold text-[#2d2b28]">Terbaru:</span> {item.latestVideo.title}</span>
+                {#if item.latestViewsText}
+                  <span class="text-[10px] font-mono shrink-0 bg-[#efe9e3] text-[#8f7556] px-1.5 py-0.5 rounded border border-[#d9cfc7] font-medium">
+                    Clip: {item.latestViewsText}
+                  </span>
+                {/if}
               </div>
             {/if}
           </div>
