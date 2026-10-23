@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { ChevronLeft, ChevronRight, AlertTriangle, Activity } from 'lucide-svelte';
   import ChannelCard from '#lib/components/ChannelCard.svelte';
   import EditSlotDialog from '#lib/components/EditSlotDialog.svelte';
+  import AgentBrainDialog from '#lib/components/AgentBrainDialog.svelte';
   import { getExpectedSlots } from '#lib/slots.js';
   import type { Channel, ContentLog, SlotTime } from '#lib/types.js';
+  import type { AgentProfile } from '#lib/agents.js';
 
   let { data } = $props();
 
@@ -64,6 +67,32 @@
     dialogOpen = true;
   }
 
+  // 3D HQ (desktop only)
+  let isDesktop = $state(false);
+  let OfficeScene = $state<any>(null);
+  let agentDialogOpen = $state(false);
+  let selectedAgent = $state<AgentProfile | null>(null);
+
+  onMount(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    isDesktop = mq.matches;
+    mq.addEventListener('change', (e) => (isDesktop = e.matches));
+
+    if (mq.matches) {
+      import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
+    }
+    mq.addEventListener('change', (e) => {
+      if (e.matches && !OfficeScene) {
+        import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
+      }
+    });
+  });
+
+  function onAgentClick(agent: AgentProfile) {
+    selectedAgent = agent;
+    agentDialogOpen = true;
+  }
+
   const timeAgo = (iso: string) => {
     const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
     return m < 1 ? 'baru saja' : m < 60 ? `${m}m lalu` : m < 1440 ? `${Math.floor(m / 60)}j lalu` : `${Math.floor(m / 1440)}h lalu`;
@@ -96,6 +125,12 @@
       {/if}
     </div>
   </header>
+
+  {#if isDesktop && OfficeScene}
+    <section aria-label="Virtual HQ 3D" class="hidden md:block">
+      <OfficeScene {onAgentClick} />
+    </section>
+  {/if}
 
   {#if data.error}
     <p role="alert" class="text-xs text-rose-300 bg-rose-950/60 border border-rose-800 rounded-xl px-4 py-3">Database error: {data.error}</p>
@@ -170,3 +205,5 @@
 {#if editing}
   <EditSlotDialog bind:open={dialogOpen} onClose={() => { dialogOpen = false; editing = null; }} channel={editing.channel} slot={editing.slot} date={data.selectedDate} log={editing.log} />
 {/if}
+
+<AgentBrainDialog bind:open={agentDialogOpen} agent={selectedAgent} />
