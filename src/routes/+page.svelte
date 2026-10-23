@@ -5,6 +5,20 @@
   import { calculateLiveProgress } from '#lib/slots.js';
   import type { ActivityLog, Channel } from '#lib/types.js';
   import type { ChannelViewSummary } from '#lib/server/channelViews.js';
+  import {
+    Eye,
+    Film,
+    Target,
+    Bot,
+    TrendingUp,
+    PieChart,
+    BarChart3,
+    RefreshCw,
+    Flame,
+    Tv,
+    Terminal,
+    ExternalLink
+  } from 'lucide-svelte';
 
   let { data } = $props();
 
@@ -164,7 +178,7 @@
         disabled={isRefreshing}
         class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#efe9e3] to-[#ffffff] hover:bg-[#efe9e3] text-xs font-mono font-bold text-[#2d2b28] border border-[#c9b59c] shadow-xs transition-all disabled:opacity-50"
       >
-        <span class={isRefreshing ? 'animate-spin' : ''}>🔄</span>
+        <RefreshCw size={14} class={isRefreshing ? 'animate-spin text-[#8f7556]' : 'text-[#8f7556]'} />
         <span>{isRefreshing ? 'Scraping YouTube Views...' : 'Refresh Live Views'}</span>
       </button>
     </form>
@@ -177,7 +191,7 @@
       <div>
         <div class="flex items-center justify-between text-xs font-mono text-[#7a756f] mb-1 font-bold">
           <span>TOTAL VIEWS TERPANTAU</span>
-          <span class="text-base">👁️</span>
+          <Eye size={18} class="text-[#8f7556]" />
         </div>
         <div class="text-2xl font-bold font-mono text-[#2d2b28] tracking-tight">
           {totalLiveViews.toLocaleString('id-ID')}+
@@ -195,7 +209,7 @@
       <div>
         <div class="flex items-center justify-between text-xs font-mono text-[#7a756f] mb-1 font-bold">
           <span>PROGRESS UPLOAD HARI INI</span>
-          <span class="text-base">🎬</span>
+          <Film size={18} class="text-emerald-700" />
         </div>
         <div class="text-2xl font-bold font-mono text-[#059669] tracking-tight">
           {progress.completedSlots} / {progress.totalSlots}
@@ -213,7 +227,7 @@
       <div>
         <div class="flex items-center justify-between text-xs font-mono text-[#7a756f] mb-1 font-bold">
           <span>BOUNTY SUBMITTED</span>
-          <span class="text-base">🎯</span>
+          <Target size={18} class="text-[#8f7556]" />
         </div>
         <div class="text-2xl font-bold font-mono text-[#8f7556] tracking-tight">
           {progress.bountySubmitted} clips
@@ -230,7 +244,7 @@
       <div>
         <div class="flex items-center justify-between text-xs font-mono text-[#7a756f] mb-1 font-bold">
           <span>AI AGENT WORKFORCE</span>
-          <span class="text-base">🤖</span>
+          <Bot size={18} class="text-[#2d2b28]" />
         </div>
         <div class="text-2xl font-bold font-mono text-[#2d2b28] tracking-tight">
           7 / 7 Online
@@ -253,7 +267,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d9cfc7]/60 pb-3">
           <div>
             <h2 class="text-base font-bold text-[#2d2b28] flex items-center gap-2">
-              <span>📈</span>
+              <TrendingUp size={18} class="text-[#8f7556]" />
               <span>24-Hour Operations & View Telemetry Curve</span>
             </h2>
             <p class="text-xs text-[#7a756f] font-mono mt-0.5">
@@ -370,7 +384,7 @@
       <div class="bg-[#ffffff] border border-[#d9cfc7] rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col justify-between">
         <div class="border-b border-[#d9cfc7]/60 pb-3">
           <h2 class="text-base font-bold text-[#2d2b28] flex items-center gap-2">
-            <span>🍩</span>
+            <PieChart size={18} class="text-[#8f7556]" />
             <span>Portfolio Breakdown</span>
           </h2>
           <p class="text-xs text-[#7a756f] font-mono mt-0.5">
@@ -477,7 +491,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d9cfc7]/60 pb-3">
         <div>
           <h2 class="text-base font-bold text-[#2d2b28] flex items-center gap-2">
-            <span>📊</span>
+            <BarChart3 size={18} class="text-[#8f7556]" />
             <span>Channel Views Performance Ranking (Comparative Bar Index)</span>
           </h2>
           <p class="text-xs text-[#7a756f] font-mono mt-0.5">
@@ -515,18 +529,19 @@
 
               <!-- Right: View Count & Link -->
               <div class="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                <span class="text-xs font-mono font-bold {item.views > 0 ? 'text-[#8f7556]' : 'text-[#7a756f]'}">
-                  🔥 {item.viewsText}
+                <span class="text-xs font-mono font-bold {item.views > 0 ? 'text-[#8f7556]' : 'text-[#7a756f]'} flex items-center gap-1">
+                  <Flame size={13} class="text-amber-600 fill-amber-500 inline" />
+                  <span>{item.viewsText}</span>
                 </span>
                 {#if item.latestVideo}
                   <a
                     href="https://www.youtube.com/shorts/{item.latestVideo.id}"
                     target="_blank"
                     rel="noreferrer"
-                    class="text-[11px] font-mono font-bold text-[#8f7556] hover:underline flex items-center gap-0.5"
+                    class="text-[11px] font-mono font-bold text-[#8f7556] hover:underline flex items-center gap-1"
                   >
                     <span>Shorts</span>
-                    <span>↗</span>
+                    <ExternalLink size={11} />
                   </a>
                 {/if}
               </div>
@@ -560,7 +575,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d9cfc7]/60 pb-3">
       <div>
         <h2 class="text-base font-bold text-[#2d2b28] flex items-center gap-2">
-          <span>📺</span>
+          <Tv size={18} class="text-[#8f7556]" />
           <span>Daftar 13 Channel & Status Terkini</span>
         </h2>
         <p class="text-xs text-[#7a756f] font-mono mt-0.5">
@@ -591,8 +606,9 @@
 
               <!-- Live Views Pill -->
               {#if stat?.latestViewsText}
-                <span class="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-[#efe9e3] text-[#8f7556] border border-[#c9b59c] shadow-2xs">
-                  🔥 {stat.latestViewsText}
+                <span class="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-[#efe9e3] text-[#8f7556] border border-[#c9b59c] shadow-2xs flex items-center gap-1">
+                  <Flame size={12} class="text-amber-600 fill-amber-500" />
+                  <span>{stat.latestViewsText}</span>
                 </span>
               {:else}
                 <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-[#efe9e3] text-[#7a756f] border border-[#d9cfc7]">
@@ -615,10 +631,10 @@
                     href="https://www.youtube.com/shorts/{stat.latestVideo.id}"
                     target="_blank"
                     rel="noreferrer"
-                    class="text-[#8f7556] font-bold hover:underline flex items-center gap-0.5"
+                    class="text-[#8f7556] font-bold hover:underline flex items-center gap-1"
                   >
                     <span>Buka Shorts</span>
-                    <span>↗</span>
+                    <ExternalLink size={10} />
                   </a>
                 </div>
                 <p class="text-xs text-[#2d2b28] font-medium line-clamp-2 leading-snug">
@@ -648,7 +664,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#d9cfc7]/60 pb-3">
       <div>
         <h2 class="text-base font-bold text-[#2d2b28] flex items-center gap-2">
-          <span>📜</span>
+          <Terminal size={18} class="text-[#8f7556]" />
           <span>Live Operations & Agent Event Stream</span>
         </h2>
         <p class="text-xs text-[#7a756f] font-mono mt-0.5">

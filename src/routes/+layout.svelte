@@ -3,6 +3,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { createClient } from '@supabase/supabase-js';
+  import { BarChart3, ListTodo, Box, Brain, Zap, Clock, Calendar, Crown, Menu } from 'lucide-svelte';
 
   let { data, children } = $props();
 
@@ -48,28 +49,28 @@
     {
       href: '/',
       label: 'Analytics & Live Logs',
-      icon: '📊',
+      icon: BarChart3,
       badge: 'Live',
       desc: 'Telemetry, upload charts, and event stream'
     },
     {
       href: '/tasks',
       label: 'Channel Tasks',
-      icon: '📋',
+      icon: ListTodo,
       badge: '13 Ch',
       desc: 'SOP upload slot scheduler & verification'
     },
     {
       href: '/hq',
       label: 'Virtual HQ 3D',
-      icon: '🏢',
+      icon: Box,
       badge: '3D Scene',
       desc: 'Interactive semi-isometric 3D agency office'
     },
     {
       href: '/agents',
       label: 'Agent Dossier',
-      icon: '🧠',
+      icon: Brain,
       badge: '7 Agents',
       desc: 'Memory CRUD, skills, and system profiles'
     }
@@ -106,7 +107,7 @@
     <div class="h-14 border-b border-[#d9cfc7] flex items-center justify-between px-3.5 bg-[#efe9e3]">
       <div class="flex items-center gap-2.5 overflow-hidden">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c9b59c] to-[#8f7556] flex items-center justify-center font-bold text-xs text-white shadow-sm shrink-0">
-          ⚡
+          <Zap size={16} />
         </div>
         {#if sidebarOpen}
           <div class="flex flex-col min-w-0">
@@ -143,6 +144,7 @@
 
       {#each navItems as item}
         {@const active = isActive(item.href, page.url.pathname)}
+        {@const Icon = item.icon}
         <a
           href={item.href}
           onclick={() => {
@@ -155,7 +157,7 @@
             : 'text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#f9f8f6]'}"
           title={!sidebarOpen ? item.label : undefined}
         >
-          <span class="text-base shrink-0 transition-transform group-hover:scale-110">{item.icon}</span>
+          <Icon size={17} class="shrink-0 transition-transform group-hover:scale-110 {active ? 'text-[#8f7556]' : 'text-[#7a756f]'}" />
           {#if sidebarOpen}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
@@ -203,7 +205,7 @@
         <!-- User Profile Pill -->
         <div class="flex items-center gap-2.5 px-2 py-1.5 bg-[#ffffff] rounded-lg border border-[#d9cfc7] shadow-xs">
           <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-            👑
+            <Crown size={14} />
           </div>
           <div class="flex flex-col min-w-0">
             <span class="text-xs font-bold text-[#2d2b28] truncate leading-tight">dude</span>
@@ -214,7 +216,7 @@
         <div class="flex flex-col items-center gap-2">
           <div class="w-2 h-2 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}" title="Supabase DB Connected"></div>
           <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-            👑
+            <Crown size={14} />
           </div>
         </div>
       {/if}
@@ -232,9 +234,7 @@
           class="md:hidden p-1.5 rounded-lg bg-[#efe9e3] border border-[#d9cfc7] text-[#2d2b28] shrink-0 hover:bg-[#d9cfc7]/50 transition-colors"
           aria-label="Toggle menu"
         >
-          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <Menu size={16} />
         </button>
         <span class="text-[#7a756f] hidden sm:inline font-medium">Agency HQ</span>
         <span class="text-[#d9cfc7] hidden sm:inline">/</span>
@@ -263,17 +263,18 @@
 
         <!-- Clock -->
         {#if currentTime}
-          <div class="text-[11px] font-mono text-[#2d2b28] bg-[#efe9e3] px-2.5 py-1 rounded-md border border-[#d9cfc7] hidden lg:block font-medium">
-            🕒 {currentTime}
+          <div class="text-[11px] font-mono text-[#2d2b28] bg-[#efe9e3] px-2.5 py-1 rounded-md border border-[#d9cfc7] hidden lg:flex items-center gap-1 font-medium">
+            <Clock size={12} class="text-[#8f7556]" />
+            <span>{currentTime}</span>
           </div>
         {/if}
 
         <!-- Date Link Selector -->
         <a
           href="?date={data.today}"
-          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#d9cfc7] bg-[#ffffff] hover:bg-[#efe9e3] text-[#2d2b28] transition-colors flex items-center gap-1 shadow-xs"
+          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#d9cfc7] bg-[#ffffff] hover:bg-[#efe9e3] text-[#2d2b28] transition-colors flex items-center gap-1.5 shadow-xs"
         >
-          <span>📅</span>
+          <Calendar size={12} class="text-[#8f7556]" />
           <span class="hidden sm:inline font-medium">{data.today}</span>
           <span class="text-[9px] text-[#8f7556] font-bold">(Today)</span>
         </a>

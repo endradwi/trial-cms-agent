@@ -49,13 +49,13 @@
     }
   });
 
-  const statuses: Array<{ id: ContentStatus; label: string; icon: string; class: string }> = [
-    { id: 'DRAFT', label: 'Draft / Belum', icon: '⚪', class: 'border-rose-300 hover:bg-rose-50 text-rose-800' },
-    { id: 'READY', label: 'Ready di Storage', icon: '🟡', class: 'border-amber-300 hover:bg-amber-50 text-amber-800' },
-    { id: 'UPLOADED', label: 'Video Uploaded', icon: '🟢', class: 'border-teal-300 hover:bg-teal-50 text-teal-800' },
-    { id: 'SUBMITTED', label: 'Bounty Submitted', icon: '🚀', class: 'border-emerald-300 hover:bg-emerald-50 text-emerald-800' },
-    { id: 'ON_HOLD', label: 'On Hold (Eval)', icon: '⏸️', class: 'border-purple-300 hover:bg-purple-50 text-purple-800' },
-    { id: 'OFF', label: 'Off / Libur', icon: '⛔', class: 'border-slate-300 hover:bg-slate-50 text-slate-700' }
+  const statuses: Array<{ id: ContentStatus; label: string; dotClass: string; class: string }> = [
+    { id: 'DRAFT', label: 'Draft / Belum', dotClass: 'bg-rose-500', class: 'border-rose-300 hover:bg-rose-50 text-rose-800' },
+    { id: 'READY', label: 'Ready di Storage', dotClass: 'bg-amber-500', class: 'border-amber-300 hover:bg-amber-50 text-amber-800' },
+    { id: 'UPLOADED', label: 'Video Uploaded', dotClass: 'bg-teal-500', class: 'border-teal-300 hover:bg-teal-50 text-teal-800' },
+    { id: 'SUBMITTED', label: 'Bounty Submitted', dotClass: 'bg-emerald-500', class: 'border-emerald-300 hover:bg-emerald-50 text-emerald-800' },
+    { id: 'ON_HOLD', label: 'On Hold (Eval)', dotClass: 'bg-purple-500', class: 'border-purple-300 hover:bg-purple-50 text-purple-800' },
+    { id: 'OFF', label: 'Off / Libur', dotClass: 'bg-slate-400', class: 'border-slate-300 hover:bg-slate-50 text-slate-700' }
   ];
 </script>
 
@@ -114,7 +114,7 @@
                 onclick={() => status = item.id}
                 class="py-1.5 px-2 rounded-lg text-[10px] font-bold border transition text-left flex items-center gap-1.5 {status === item.id ? 'bg-[#2d2b28] border-[#2d2b28] text-white shadow-sm' : `bg-[#f9f8f6] ${item.class}`}"
               >
-                <span>{item.icon}</span>
+                <span class="w-2 h-2 rounded-full {item.dotClass} shrink-0"></span>
                 <span class="truncate">{item.label}</span>
               </button>
             {/each}

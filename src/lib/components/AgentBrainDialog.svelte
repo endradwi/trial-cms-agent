@@ -152,7 +152,7 @@
             {#each agent.memories as mem}
               <div class="p-3 rounded-xl bg-[#f9f8f6] border border-[#d9cfc7] flex flex-col gap-1 text-xs group">
                 <div class="flex items-center justify-between text-[10px]">
-                  <span class="font-bold text-[#8f7556] uppercase tracking-wider">🏷️ {mem.category}</span>
+                  <span class="font-bold text-[#8f7556] uppercase tracking-wider">{mem.category}</span>
                   {#if mem.id}
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {#if editingMemId === mem.id}

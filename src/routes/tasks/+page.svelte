@@ -6,6 +6,7 @@
   import EditSlotDialog from '#lib/components/EditSlotDialog.svelte';
   import { totalSlotsForChannel, calculateLiveProgress } from '#lib/slots.js';
   import type { Channel, ContentLog, SlotTime } from '#lib/types.js';
+  import { ListTodo } from 'lucide-svelte';
 
   let { data } = $props();
 
@@ -65,7 +66,7 @@
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#ffffff] border border-[#d9cfc7] p-5 sm:p-6 rounded-2xl shadow-xs">
     <div>
       <h1 class="text-xl font-bold tracking-tight text-[#2d2b28] flex items-center gap-2">
-        <span>📋</span>
+        <ListTodo size={20} class="text-[#8f7556]" />
         <span>Channel Tasks & SOP Upload Schedule</span>
       </h1>
       <p class="text-xs text-[#7a756f] mt-1 font-mono">
@@ -128,7 +129,7 @@
           ? 'bg-[#2d2b28] text-white font-bold shadow-xs'
           : 'text-[#7a756f] hover:bg-[#efe9e3]'}"
       >
-        🛒 Affiliate (1)
+        Affiliate (1)
       </button>
     </div>
 

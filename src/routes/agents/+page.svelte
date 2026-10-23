@@ -1,6 +1,7 @@
 <script lang="ts">
   import AgentBrainDialog from '#lib/components/AgentBrainDialog.svelte';
   import type { AgentProfile } from '#lib/agents.js';
+  import { Brain, Search } from 'lucide-svelte';
 
   let { data } = $props();
 
@@ -22,7 +23,7 @@
   <div class="bg-[#ffffff] border border-[#d9cfc7] p-5 sm:p-6 rounded-2xl shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
     <div>
       <h1 class="text-xl font-bold tracking-tight text-[#2d2b28] flex items-center gap-2">
-        <span>🧠</span>
+        <Brain size={20} class="text-[#8f7556]" />
         <span>AI Agent Brain & Dossier Management</span>
       </h1>
       <p class="text-xs text-[#7a756f] mt-1 font-mono">
@@ -98,7 +99,7 @@
           onclick={() => inspectAgent(agent)}
           class="w-full py-2 px-3 rounded-xl bg-[#efe9e3] hover:bg-[#d9cfc7] text-xs font-mono font-bold text-[#2d2b28] transition-colors border border-[#c9b59c] flex items-center justify-center gap-2 shadow-2xs"
         >
-          <span>🔍</span>
+          <Search size={14} class="text-[#8f7556]" />
           <span>Buka Dossier & Edit Memori</span>
         </button>
       </div>
