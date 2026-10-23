@@ -144,33 +144,83 @@
 
     // Glass Partitions (Frosted glass separating wings)
     const glassMat = new THREE.MeshStandardMaterial({
-      color: 0x22396f,
+      color: 0x1d4ed8,
+      emissive: 0x0f2b66,
+      emissiveIntensity: 0.3,
       transparent: true,
-      opacity: 0.35,
-      roughness: 0.15,
-      metalness: 0.1
+      opacity: 0.55,
+      roughness: 0.1,
+      metalness: 0.2
     });
     const railMat = new THREE.MeshStandardMaterial({
       color: 0x00e5ff,
       emissive: 0x00e5ff,
-      emissiveIntensity: 0.7
+      emissiveIntensity: 0.85
+    });
+    const pillarMat = new THREE.MeshStandardMaterial({
+      color: 0x22396f,
+      metalness: 0.7,
+      roughness: 0.3
     });
 
-    // Left Wing Glass Divider (z = -6.8 to -0.5)
-    const glassL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.5, 6.2), glassMat);
-    glassL.position.set(-1.8, 1.25, -3.6);
-    scene.add(glassL);
-    const railL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 6.2), railMat);
-    railL.position.set(-1.8, 2.53, -3.6);
-    scene.add(railL);
+    // Helper to create architectural glass wall with pillars & frosted band
+    function createGlassWall(x: number) {
+      // Glass body
+      const glass = new THREE.Mesh(new THREE.BoxGeometry(0.08, 2.5, 6.2), glassMat);
+      glass.position.set(x, 1.25, -3.6);
+      scene.add(glass);
 
-    // Right Wing Glass Divider (z = -6.8 to -0.5)
-    const glassR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.5, 6.2), glassMat);
-    glassR.position.set(1.8, 1.25, -3.6);
-    scene.add(glassR);
-    const railR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 6.2), railMat);
-    railR.position.set(1.8, 2.53, -3.6);
-    scene.add(railR);
+      // Top glowing neon rail
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 6.2), railMat);
+      rail.position.set(x, 2.54, -3.6);
+      scene.add(rail);
+
+      // Bottom baseboard
+      const base = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 6.2), pillarMat);
+      base.position.set(x, 0.06, -3.6);
+      scene.add(base);
+
+      // Middle frosted band
+      const band = new THREE.Mesh(
+        new THREE.BoxGeometry(0.09, 0.25, 6.2),
+        new THREE.MeshStandardMaterial({ color: 0x22396f, emissive: 0x00e5ff, emissiveIntensity: 0.2, transparent: true, opacity: 0.75 })
+      );
+      band.position.set(x, 1.2, -3.6);
+      scene.add(band);
+
+      // Vertical support pillars (at back, middle, front)
+      for (const z of [-6.7, -3.6, -0.5]) {
+        const pillar = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.6, 0.14), pillarMat);
+        pillar.position.set(x, 1.3, z);
+        scene.add(pillar);
+      }
+    }
+
+    createGlassWall(-1.8);
+    createGlassWall(1.8);
+
+    // Glowing Entrance Signs over walkways
+    function createWingSign(x: number, text: string, colorHex: number) {
+      const signCanvas = document.createElement('canvas');
+      signCanvas.width = 256;
+      signCanvas.height = 64;
+      const ctx = signCanvas.getContext('2d')!;
+      ctx.fillStyle = '#0a163a';
+      ctx.fillRect(0, 0, 256, 64);
+      ctx.fillStyle = '#fcf1d0';
+      ctx.font = 'bold 24px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, 128, 42);
+      const signTex = new THREE.CanvasTexture(signCanvas);
+      const signMesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.4, 0.35),
+        new THREE.MeshBasicMaterial({ map: signTex, transparent: true })
+      );
+      signMesh.position.set(x, 2.7, -0.5);
+      scene.add(signMesh);
+    }
+    createWingSign(-1.8, 'CREATIVE WING', 0xffa500);
+    createWingSign(1.8, 'TECH LAB', 0x00e5ff);
 
     // Whiteboard on left wall with sticky notes
     const boardFrame = new THREE.Mesh(
