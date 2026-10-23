@@ -106,7 +106,10 @@
   let isDesktop = $state(false);
   let OfficeScene = $state<any>(null);
   let agentDialogOpen = $state(false);
-  let selectedAgent = $state<AgentProfile | null>(null);
+  let selectedAgentSlug = $state<string | null>(null);
+  let selectedAgent = $derived(
+    selectedAgentSlug ? (agents.find((a) => a.slug === selectedAgentSlug) ?? null) : null
+  );
 
   onMount(() => {
     const mq = window.matchMedia('(min-width: 768px)');
@@ -124,17 +127,9 @@
   });
 
   function onAgentClick(agent: AgentProfile) {
-    selectedAgent = agent;
+    selectedAgentSlug = agent.slug;
     agentDialogOpen = true;
   }
-
-  // Keep selectedAgent in sync when data refreshes (realtime)
-  $effect(() => {
-    if (selectedAgent && agents.length) {
-      const fresh = agents.find(a => a.slug === selectedAgent!.slug);
-      if (fresh) selectedAgent = fresh;
-    }
-  });
 
   const timeAgo = (iso: string) => {
     const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);

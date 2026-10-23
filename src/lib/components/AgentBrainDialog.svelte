@@ -225,6 +225,9 @@
             {/if}
           </div>
         {/if}
+      {:else}
+        <Dialog.Title class="sr-only">Agent Dossier</Dialog.Title>
+        <Dialog.Description class="sr-only">Detail profil agent</Dialog.Description>
       {/if}
     </Dialog.Content>
   </Dialog.Portal>

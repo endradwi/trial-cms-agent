@@ -192,7 +192,7 @@
       group.add(plate);
 
       group.position.set(agent.deskPos.x, agent.deskPos.y, agent.deskPos.z);
-      group.userData = { agentId: agent.id };
+      group.userData = { agentId: agent.id, agentSlug: agent.slug };
 
       clickables.push(group);
       return group;
@@ -223,8 +223,20 @@
       scene.add(led);
     }
 
+    // Track mouse down to distinguish click from camera rotation/drag
+    let downX = 0;
+    let downY = 0;
+    const handleMouseDown = (e: MouseEvent) => {
+      downX = e.clientX;
+      downY = e.clientY;
+    };
+    renderer.domElement.addEventListener('mousedown', handleMouseDown);
+
     // Click handler
     const handleClick = (event: MouseEvent) => {
+      const dist = Math.hypot(event.clientX - downX, event.clientY - downY);
+      if (dist > 8) return; // Ignore drag / camera orbit gesture
+
       const rect = renderer.domElement.getBoundingClientRect();
       mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -232,9 +244,11 @@
       const hits = raycaster.intersectObjects(clickables, true);
       if (hits.length > 0) {
         let obj: THREE.Object3D | null = hits[0].object;
-        while (obj && !obj.userData?.agentId) obj = obj.parent;
-        if (obj?.userData?.agentId) {
-          const agent = agents.find(a => a.id === obj!.userData.agentId);
+        while (obj && !obj.userData?.agentId && !obj.userData?.agentSlug) obj = obj.parent;
+        if (obj?.userData) {
+          const targetId = obj.userData.agentId;
+          const targetSlug = obj.userData.agentSlug;
+          const agent = agents.find(a => (targetId && a.id === targetId) || (targetSlug && a.slug === targetSlug));
           if (agent) onAgentClick(agent);
         }
       }
@@ -285,6 +299,7 @@
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      renderer.domElement.removeEventListener('mousedown', handleMouseDown);
       renderer.domElement.removeEventListener('click', handleClick);
       renderer.domElement.removeEventListener('mousemove', handleMove);
       window.removeEventListener('resize', onResize);
