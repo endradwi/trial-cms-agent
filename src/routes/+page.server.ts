@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ url }) => {
 export const actions: Actions = {
   refreshViews: async () => {
     try {
-      await execAsync('python3 /opt/clipper/audit_all_channels.py', { timeout: 20000 });
+      await getLiveChannelViews(true);
       return { success: true };
     } catch (err: any) {
       console.error('Failed to audit channels:', err);

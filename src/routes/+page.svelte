@@ -195,7 +195,7 @@
     <!-- Grid of Live Channel View Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {#each data.channels as ch (ch.id)}
-        {@const stat = (ch.handle ? viewsData[ch.handle] : undefined) ?? viewsData['@' + ch.slug]}
+        {@const stat = (ch.handle ? viewsData[ch.handle] : undefined) ?? viewsData['@' + ch.slug] ?? viewsData[ch.slug]}
         <div class="bg-[#071330] border border-[#22396f]/70 hover:border-[#00e5ff]/50 rounded-xl p-4 flex flex-col justify-between transition-all group">
           <div>
             <!-- Channel Header -->
