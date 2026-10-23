@@ -85,37 +85,37 @@
   <title>Agency Ops Console — AI Virtual Headquarters</title>
 </svelte:head>
 
-<div class="h-screen w-screen overflow-hidden flex bg-[#010736] text-[#fcf1d0] font-sans antialiased selection:bg-[#22396f] selection:text-[#fcf1d0]">
+<div class="h-screen w-screen overflow-hidden flex bg-[#f9f8f6] text-[#2d2b28] font-sans antialiased selection:bg-[#c9b59c] selection:text-[#2d2b28]">
   <!-- Mobile Backdrop Overlay -->
   {#if sidebarOpen}
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      class="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
+      class="fixed inset-0 bg-black/40 z-20 md:hidden backdrop-blur-sm"
       onclick={() => (sidebarOpen = false)}
     ></div>
   {/if}
 
-  <!-- Supabase-style Sidebar -->
+  <!-- Supabase-style Sidebar (ColorHunt Warm Light Palette) -->
   <aside
-    class="fixed inset-y-0 left-0 md:static flex flex-col border-r border-[#22396f]/50 bg-[#071330] transition-all duration-200 z-30 shrink-0 {sidebarOpen
+    class="fixed inset-y-0 left-0 md:static flex flex-col border-r border-[#d9cfc7] bg-[#efe9e3] transition-all duration-200 z-30 shrink-0 {sidebarOpen
       ? 'w-64 translate-x-0'
       : '-translate-x-full md:translate-x-0 md:w-16'}"
   >
     <!-- Brand / Project Header -->
-    <div class="h-14 border-b border-[#22396f]/50 flex items-center justify-between px-3.5">
+    <div class="h-14 border-b border-[#d9cfc7] flex items-center justify-between px-3.5 bg-[#efe9e3]">
       <div class="flex items-center gap-2.5 overflow-hidden">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10b981] to-[#00e5ff] flex items-center justify-center font-bold text-xs text-[#010736] shadow-md shadow-[#00e5ff]/20 shrink-0">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c9b59c] to-[#8f7556] flex items-center justify-center font-bold text-xs text-white shadow-sm shrink-0">
           ⚡
         </div>
         {#if sidebarOpen}
           <div class="flex flex-col min-w-0">
-            <span class="font-bold text-sm tracking-tight text-[#fcf1d0] truncate flex items-center gap-1.5">
+            <span class="font-bold text-sm tracking-tight text-[#2d2b28] truncate flex items-center gap-1.5">
               Agency HQ
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#22396f]/60 text-[#8fa2cb] border border-[#22396f]">PROD</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#ffffff] text-[#8f7556] border border-[#d9cfc7] font-semibold">PROD</span>
             </span>
-            <span class="text-[11px] font-mono text-[#8fa2cb]/70 truncate flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span class="text-[11px] font-mono text-[#7a756f] truncate flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
               option-agency/main
             </span>
           </div>
@@ -123,7 +123,7 @@
       </div>
       <button
         onclick={() => (sidebarOpen = !sidebarOpen)}
-        class="text-[#8fa2cb] hover:text-[#fcf1d0] p-1.5 rounded-md hover:bg-[#0d1c42] transition-colors shrink-0"
+        class="text-[#7a756f] hover:text-[#2d2b28] p-1.5 rounded-md hover:bg-[#d9cfc7]/40 transition-colors shrink-0"
         title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
         aria-label="Toggle sidebar"
       >
@@ -136,7 +136,7 @@
     <!-- Navigation List -->
     <nav class="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
       {#if sidebarOpen}
-        <div class="px-2.5 pb-2 text-[10px] font-mono uppercase tracking-wider text-[#8fa2cb]/60 font-semibold">
+        <div class="px-2.5 pb-2 text-[10px] font-mono uppercase tracking-wider text-[#7a756f] font-bold">
           Operations Modules
         </div>
       {/if}
@@ -151,8 +151,8 @@
             }
           }}
           class="flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-medium transition-all group relative {active
-            ? 'bg-[#0d1c42] text-[#fcf1d0] font-semibold border border-[#22396f] shadow-inner shadow-[#010736]/50'
-            : 'text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#0d1c42]/60'}"
+            ? 'bg-[#ffffff] text-[#2d2b28] font-bold border border-[#d9cfc7] shadow-sm'
+            : 'text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#f9f8f6]'}"
           title={!sidebarOpen ? item.label : undefined}
         >
           <span class="text-base shrink-0 transition-transform group-hover:scale-110">{item.icon}</span>
@@ -161,7 +161,7 @@
               <div class="flex items-center justify-between">
                 <span class="truncate">{item.label}</span>
                 {#if item.badge}
-                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border {active ? 'bg-[#22396f] text-[#fcf1d0] border-[#3b82f6]' : 'bg-[#010736]/60 text-[#8fa2cb] border-[#22396f]/40'}">
+                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border {active ? 'bg-[#c9b59c]/30 text-[#8f7556] border-[#c9b59c] font-bold' : 'bg-[#ffffff] text-[#7a756f] border-[#d9cfc7]'}">
                     {item.badge}
                   </span>
                 {/if}
@@ -169,51 +169,51 @@
             </div>
           {/if}
           {#if active}
-            <div class="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#00e5ff] rounded-r"></div>
+            <div class="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#c9b59c] rounded-r"></div>
           {/if}
         </a>
       {/each}
     </nav>
 
     <!-- Bottom Sidebar Status & User Info -->
-    <div class="p-3 border-t border-[#22396f]/50 space-y-2 bg-[#050e24]/70">
+    <div class="p-3 border-t border-[#d9cfc7] space-y-2 bg-[#efe9e3]">
       {#if sidebarOpen}
         <!-- Telemetry Indicators -->
-        <div class="space-y-1.5 text-[11px] font-mono text-[#8fa2cb]/80 bg-[#0d1c42]/50 p-2.5 rounded-lg border border-[#22396f]/40">
+        <div class="space-y-1.5 text-[11px] font-mono text-[#7a756f] bg-[#ffffff] p-2.5 rounded-lg border border-[#d9cfc7] shadow-xs">
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full {isRealtimeActive ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-500'}"></span>
+              <span class="w-1.5 h-1.5 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}"></span>
               Supabase DB
             </span>
-            <span class="text-emerald-400 font-semibold text-[10px]">Connected</span>
+            <span class="text-emerald-600 font-bold text-[10px]">Connected</span>
           </div>
           <div class="flex items-center justify-between">
             <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-600"></span>
               Telegram Bot
             </span>
-            <span class="text-[#fcf1d0]/80 text-[10px]">@coco_vendor</span>
+            <span class="text-[#2d2b28] font-medium text-[10px]">@coco_vendor</span>
           </div>
-          <div class="flex items-center justify-between text-[10px] text-[#8fa2cb]/60 pt-0.5 border-t border-[#22396f]/30">
+          <div class="flex items-center justify-between text-[10px] text-[#7a756f] pt-0.5 border-t border-[#d9cfc7]/60">
             <span>VPS Host</span>
-            <span>43.134.28.4:3001</span>
+            <span class="font-mono">43.134.28.4:3001</span>
           </div>
         </div>
 
         <!-- User Profile Pill -->
-        <div class="flex items-center gap-2.5 px-1 py-1">
-          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-[#010736] font-bold text-xs flex items-center justify-center shrink-0 shadow">
+        <div class="flex items-center gap-2.5 px-2 py-1.5 bg-[#ffffff] rounded-lg border border-[#d9cfc7] shadow-xs">
+          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
             👑
           </div>
           <div class="flex flex-col min-w-0">
-            <span class="text-xs font-semibold text-[#fcf1d0] truncate leading-tight">dude</span>
-            <span class="text-[10px] font-mono text-[#8fa2cb] truncate">Owner & Tech Lead</span>
+            <span class="text-xs font-bold text-[#2d2b28] truncate leading-tight">dude</span>
+            <span class="text-[10px] font-mono text-[#7a756f] truncate">Owner & Tech Lead</span>
           </div>
         </div>
       {:else}
         <div class="flex flex-col items-center gap-2">
-          <div class="w-2 h-2 rounded-full {isRealtimeActive ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-500'}" title="Supabase DB Connected"></div>
-          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-500 to-amber-300 text-[#010736] font-bold text-xs flex items-center justify-center shrink-0">
+          <div class="w-2 h-2 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}" title="Supabase DB Connected"></div>
+          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
             👑
           </div>
         </div>
@@ -222,23 +222,23 @@
   </aside>
 
   <!-- Main Viewport (Top Bar + Dynamic Content) -->
-  <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#010736]">
+  <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#f9f8f6]">
     <!-- Top Bar -->
-    <header class="h-14 border-b border-[#22396f]/50 bg-[#071330]/90 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 z-20">
+    <header class="h-14 border-b border-[#d9cfc7] bg-[#ffffff]/90 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 z-20">
       <!-- Breadcrumb & Mobile Menu Toggle -->
       <div class="flex items-center gap-2 text-xs font-mono min-w-0">
         <button
           onclick={() => (sidebarOpen = !sidebarOpen)}
-          class="md:hidden p-1.5 rounded-lg bg-[#0d1c42] border border-[#22396f] text-[#fcf1d0] shrink-0 hover:bg-[#22396f]/50 transition-colors"
+          class="md:hidden p-1.5 rounded-lg bg-[#efe9e3] border border-[#d9cfc7] text-[#2d2b28] shrink-0 hover:bg-[#d9cfc7]/50 transition-colors"
           aria-label="Toggle menu"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
-        <span class="text-[#8fa2cb]/70 hidden sm:inline">Agency HQ</span>
-        <span class="text-[#22396f] hidden sm:inline">/</span>
-        <span class="text-[#fcf1d0] font-semibold truncate max-w-[140px] sm:max-w-none">
+        <span class="text-[#7a756f] hidden sm:inline font-medium">Agency HQ</span>
+        <span class="text-[#d9cfc7] hidden sm:inline">/</span>
+        <span class="text-[#2d2b28] font-bold truncate max-w-[140px] sm:max-w-none">
           {#if page.url.pathname === '/'}
             Analytics & Live Logs
           {:else if page.url.pathname.startsWith('/tasks')}
@@ -256,14 +256,14 @@
       <!-- Quick Actions & Clocks -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <!-- Realtime Badge -->
-        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>Realtime Live</span>
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-emerald-500/40 bg-emerald-50 text-emerald-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
+          <span class="font-semibold">Realtime Live</span>
         </div>
 
         <!-- Clock -->
         {#if currentTime}
-          <div class="text-[11px] font-mono text-[#8fa2cb] bg-[#0d1c42] px-2.5 py-1 rounded-md border border-[#22396f]/40 hidden lg:block">
+          <div class="text-[11px] font-mono text-[#2d2b28] bg-[#efe9e3] px-2.5 py-1 rounded-md border border-[#d9cfc7] hidden lg:block font-medium">
             🕒 {currentTime}
           </div>
         {/if}
@@ -271,17 +271,17 @@
         <!-- Date Link Selector -->
         <a
           href="?date={data.today}"
-          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#22396f] bg-[#0d1c42] hover:bg-[#22396f]/40 text-[#fcf1d0] transition-colors flex items-center gap-1"
+          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#d9cfc7] bg-[#ffffff] hover:bg-[#efe9e3] text-[#2d2b28] transition-colors flex items-center gap-1 shadow-xs"
         >
           <span>📅</span>
-          <span class="hidden sm:inline">{data.today}</span>
-          <span class="text-[9px] text-[#00e5ff] font-bold">(Today)</span>
+          <span class="hidden sm:inline font-medium">{data.today}</span>
+          <span class="text-[9px] text-[#8f7556] font-bold">(Today)</span>
         </a>
       </div>
     </header>
 
     <!-- Content Workspace -->
-    <main class="flex-1 min-w-0 overflow-y-auto">
+    <main class="flex-1 min-w-0 overflow-y-auto bg-[#f9f8f6]">
       {@render children()}
     </main>
   </div>

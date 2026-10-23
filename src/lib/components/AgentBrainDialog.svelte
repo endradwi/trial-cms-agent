@@ -31,35 +31,35 @@
   const statusBadge = $derived.by(() => {
     switch (agent?.status) {
       case 'WORKING':
-        return { label: 'Working on Task', bg: 'bg-emerald-950 text-emerald-300 border-emerald-600', dot: 'bg-emerald-400' };
+        return { label: 'Working on Task', bg: 'bg-emerald-50 text-emerald-800 border-emerald-300', dot: 'bg-emerald-500' };
       case 'THINKING':
-        return { label: 'Analyzing / Thinking', bg: 'bg-amber-950 text-amber-300 border-amber-600', dot: 'bg-amber-400' };
+        return { label: 'Analyzing / Thinking', bg: 'bg-amber-50 text-amber-800 border-amber-300', dot: 'bg-amber-500' };
       case 'RESTING':
-        return { label: 'Resting / Cooldown', bg: 'bg-slate-900 text-slate-300 border-slate-700', dot: 'bg-slate-400' };
+        return { label: 'Resting / Cooldown', bg: 'bg-slate-100 text-slate-700 border-slate-300', dot: 'bg-slate-400' };
       case 'IDLE':
       default:
-        return { label: 'Standby / Idle', bg: 'bg-blue-950 text-blue-300 border-blue-600', dot: 'bg-blue-400' };
+        return { label: 'Standby / Idle', bg: 'bg-blue-50 text-blue-800 border-blue-300', dot: 'bg-blue-500' };
     }
   });
 </script>
 
 <Dialog.Root bind:open>
   <Dialog.Portal>
-    <Dialog.Overlay class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md transition-all" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 w-full max-w-xl translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-[#0d1c42] p-6 border border-[#22396f] shadow-2xl font-mono text-[#fcf1d0] max-h-[90vh] overflow-y-auto">
+    <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs transition-all" />
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 w-full max-w-xl translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-[#ffffff] p-6 border border-[#d9cfc7] shadow-2xl font-mono text-[#2d2b28] max-h-[90vh] overflow-y-auto">
       {#if agent}
         <!-- Header -->
-        <div class="flex items-start justify-between pb-4 border-b border-[#22396f]/40">
+        <div class="flex items-start justify-between pb-4 border-b border-[#d9cfc7]">
           <div class="flex items-center gap-3">
             <div
-              class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl border shadow-lg"
-              style="background-color: {agent.accentColor}15; border-color: {agent.accentColor}50;"
+              class="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl border shadow-2xs"
+              style="background-color: {agent.accentColor}20; border-color: {agent.accentColor}60;"
             >
               {agent.avatarIcon}
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <Dialog.Title class="text-base font-bold text-[#fcf1d0]">
+                <Dialog.Title class="text-base font-bold text-[#2d2b28]">
                   {agent.name}
                 </Dialog.Title>
                 <span class="text-[10px] px-2 py-0.5 rounded-full border font-bold flex items-center gap-1 {statusBadge.bg}">
@@ -67,32 +67,32 @@
                   <span>{statusBadge.label}</span>
                 </span>
               </div>
-              <Dialog.Description class="text-xs text-[#8fa2cb] mt-0.5">
+              <Dialog.Description class="text-xs text-[#7a756f] mt-0.5">
                 {agent.title}
               </Dialog.Description>
             </div>
           </div>
 
-          <Dialog.Close class="p-1 rounded-lg text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#22396f]/30">
+          <Dialog.Close class="p-1 rounded-lg text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3]">
             <X size={18} />
           </Dialog.Close>
         </div>
 
         <!-- Live Task Banner -->
-        <div class="my-3 p-3 rounded-xl bg-[#010736] border border-[#22396f]/40 flex items-start gap-2.5">
-          <Activity size={16} class="text-[#fcf1d0] mt-0.5 flex-shrink-0 animate-pulse" />
+        <div class="my-3 p-3 rounded-xl bg-[#f9f8f6] border border-[#d9cfc7] flex items-start gap-2.5">
+          <Activity size={16} class="text-[#8f7556] mt-0.5 flex-shrink-0 animate-pulse" />
           <div class="text-xs">
-            <span class="text-[#8fa2cb] text-[10px] uppercase font-bold block">Aktivitas Terkini:</span>
-            <span class="text-[#fcf1d0] font-medium leading-relaxed">{agent.currentTask}</span>
+            <span class="text-[#7a756f] text-[10px] uppercase font-bold block">Aktivitas Terkini:</span>
+            <span class="text-[#2d2b28] font-medium leading-relaxed">{agent.currentTask}</span>
           </div>
         </div>
 
         <!-- Tabs Navigation -->
-        <div class="grid grid-cols-3 gap-1 p-1 bg-[#010736] rounded-xl border border-[#22396f]/30 mb-4 text-xs font-bold">
+        <div class="grid grid-cols-3 gap-1 p-1 bg-[#efe9e3] rounded-xl border border-[#d9cfc7] mb-4 text-xs font-bold">
           <button
             type="button"
             onclick={() => activeTab = 'overview'}
-            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'overview' ? 'bg-[#22396f] text-[#fcf1d0] shadow' : 'text-[#8fa2cb] hover:text-[#fcf1d0]'}"
+            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'overview' ? 'bg-[#ffffff] text-[#2d2b28] shadow-xs' : 'text-[#7a756f] hover:text-[#2d2b28]'}"
           >
             <Brain size={13} />
             <span>Sifat & Role</span>
@@ -100,7 +100,7 @@
           <button
             type="button"
             onclick={() => activeTab = 'skills'}
-            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'skills' ? 'bg-[#22396f] text-[#fcf1d0] shadow' : 'text-[#8fa2cb] hover:text-[#fcf1d0]'}"
+            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'skills' ? 'bg-[#ffffff] text-[#2d2b28] shadow-xs' : 'text-[#7a756f] hover:text-[#2d2b28]'}"
           >
             <Wrench size={13} />
             <span>Skills ({agent.skills.length})</span>
@@ -108,7 +108,7 @@
           <button
             type="button"
             onclick={() => { activeTab = 'memories'; cancelEdit(); cancelAdd(); }}
-            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'memories' ? 'bg-[#22396f] text-[#fcf1d0] shadow' : 'text-[#8fa2cb] hover:text-[#fcf1d0]'}"
+            class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'memories' ? 'bg-[#ffffff] text-[#2d2b28] shadow-xs' : 'text-[#7a756f] hover:text-[#2d2b28]'}"
           >
             <Sparkles size={13} />
             <span>Memori ({agent.memories.length})</span>
@@ -118,30 +118,30 @@
         <!-- Tab Content -->
         {#if activeTab === 'overview'}
           <div class="flex flex-col gap-3 text-xs leading-relaxed">
-            <div class="p-3.5 bg-[#010736]/60 rounded-xl border border-[#22396f]/30">
-              <span class="text-[10px] text-[#8fa2cb] uppercase font-bold block mb-1">Tanggung Jawab Utama:</span>
-              <p class="text-[#fcf1d0]">{agent.role}</p>
+            <div class="p-3.5 bg-[#f9f8f6] rounded-xl border border-[#d9cfc7]">
+              <span class="text-[10px] text-[#7a756f] uppercase font-bold block mb-1">Tanggung Jawab Utama:</span>
+              <p class="text-[#2d2b28]">{agent.role}</p>
             </div>
 
-            <div class="p-3.5 bg-[#010736]/60 rounded-xl border border-[#22396f]/30">
-              <span class="text-[10px] text-[#8fa2cb] uppercase font-bold block mb-1">Kepribadian & Gaya Komunikasi:</span>
-              <p class="text-[#c7d5f5] italic">"{agent.personality}"</p>
+            <div class="p-3.5 bg-[#f9f8f6] rounded-xl border border-[#d9cfc7]">
+              <span class="text-[10px] text-[#7a756f] uppercase font-bold block mb-1">Kepribadian & Gaya Komunikasi:</span>
+              <p class="text-[#2d2b28] italic">"{agent.personality}"</p>
             </div>
           </div>
         {:else if activeTab === 'skills'}
           <div class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
             {#each agent.skills as skill}
-              <div class="p-3 rounded-xl bg-[#010736] border border-[#22396f]/30 flex flex-col gap-1">
+              <div class="p-3 rounded-xl bg-[#f9f8f6] border border-[#d9cfc7] flex flex-col gap-1">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#fcf1d0]"></span>
-                    <span class="font-bold text-xs text-[#fcf1d0]">{skill.name}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#8f7556]"></span>
+                    <span class="font-bold text-xs text-[#2d2b28]">{skill.name}</span>
                   </div>
-                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#0d1c42] border border-[#22396f]/40 text-[#8fa2cb] font-bold uppercase">
+                  <span class="text-[9px] px-1.5 py-0.5 rounded bg-[#ffffff] border border-[#d9cfc7] text-[#7a756f] font-bold uppercase">
                     {skill.category}
                   </span>
                 </div>
-                <p class="text-[11px] text-[#8fa2cb] leading-relaxed pl-3.5">
+                <p class="text-[11px] text-[#7a756f] leading-relaxed pl-3.5">
                   {skill.description}
                 </p>
               </div>
@@ -150,23 +150,23 @@
         {:else if activeTab === 'memories'}
           <div class="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1">
             {#each agent.memories as mem}
-              <div class="p-3 rounded-xl bg-[#010736] border border-[#22396f]/30 flex flex-col gap-1 text-xs group">
+              <div class="p-3 rounded-xl bg-[#f9f8f6] border border-[#d9cfc7] flex flex-col gap-1 text-xs group">
                 <div class="flex items-center justify-between text-[10px]">
-                  <span class="font-bold text-[#fcf1d0] uppercase tracking-wider">🏷️ {mem.category}</span>
+                  <span class="font-bold text-[#8f7556] uppercase tracking-wider">🏷️ {mem.category}</span>
                   {#if mem.id}
                     <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       {#if editingMemId === mem.id}
                         <form method="POST" action="?/updateMemory" use:enhance={() => { return async ({ update }) => { cancelEdit(); await update(); }; }}>
                           <input type="hidden" name="id" value={mem.id} />
                           <input type="hidden" name="content" value={editingContent} />
-                          <button type="submit" class="p-0.5 rounded text-emerald-400 hover:bg-emerald-950" title="Simpan"><Check size={12} /></button>
+                          <button type="submit" class="p-0.5 rounded text-emerald-600 hover:bg-emerald-50" title="Simpan"><Check size={12} /></button>
                         </form>
-                        <button type="button" onclick={cancelEdit} class="p-0.5 rounded text-[#8fa2cb] hover:bg-[#22396f]/30" title="Batal"><X size={12} /></button>
+                        <button type="button" onclick={cancelEdit} class="p-0.5 rounded text-[#7a756f] hover:bg-[#efe9e3]" title="Batal"><X size={12} /></button>
                       {:else}
-                        <button type="button" onclick={() => startEdit(mem)} class="p-0.5 rounded text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#22396f]/30" title="Edit"><Pencil size={12} /></button>
+                        <button type="button" onclick={() => startEdit(mem)} class="p-0.5 rounded text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3]" title="Edit"><Pencil size={12} /></button>
                         <form method="POST" action="?/deleteMemory" use:enhance>
                           <input type="hidden" name="id" value={mem.id} />
-                          <button type="submit" class="p-0.5 rounded text-rose-400 hover:bg-rose-950" title="Hapus"><Trash2 size={12} /></button>
+                          <button type="submit" class="p-0.5 rounded text-rose-600 hover:bg-rose-50" title="Hapus"><Trash2 size={12} /></button>
                         </form>
                       {/if}
                     </div>
@@ -176,22 +176,22 @@
                   <textarea
                     bind:value={editingContent}
                     rows={2}
-                    class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 mt-1 focus:outline-none focus:border-[#fcf1d0]/40 resize-none"
+                    class="w-full bg-[#ffffff] border border-[#d9cfc7] rounded-lg text-[11px] text-[#2d2b28] p-2 mt-1 focus:outline-none focus:border-[#8f7556] resize-none"
                   ></textarea>
                 {:else}
-                  <p class="text-[#c7d5f5] text-[11px] leading-relaxed pl-1 pt-0.5">
+                  <p class="text-[#2d2b28] text-[11px] leading-relaxed pl-1 pt-0.5">
                     • {mem.content}
                   </p>
                 {/if}
               </div>
             {:else}
-              <p class="text-[11px] text-[#8fa2cb]">Belum ada memori tersimpan.</p>
+              <p class="text-[11px] text-[#7a756f]">Belum ada memori tersimpan.</p>
             {/each}
 
             <!-- Add new memory form -->
             {#if addingMemory}
               <form method="POST" action="?/addMemory" use:enhance={() => { return async ({ update }) => { cancelAdd(); await update(); }; }}
-                class="p-3 rounded-xl bg-[#010736] border border-emerald-800/40 flex flex-col gap-2"
+                class="p-3 rounded-xl bg-[#ffffff] border border-emerald-400 flex flex-col gap-2"
               >
                 <input type="hidden" name="agent_id" value={agent.id} />
                 <input
@@ -199,7 +199,7 @@
                   name="category"
                   placeholder="Kategori (misal: rule, ops, infra)"
                   required
-                  class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 focus:outline-none focus:border-[#fcf1d0]/40 placeholder:text-[#8fa2cb]/40"
+                  class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-lg text-[11px] text-[#2d2b28] p-2 focus:outline-none focus:border-[#8f7556] placeholder:text-[#7a756f]/50"
                 />
                 <textarea
                   bind:value={newContent}
@@ -207,18 +207,18 @@
                   placeholder="Isi memori baru…"
                   required
                   rows={2}
-                  class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 focus:outline-none focus:border-[#fcf1d0]/40 resize-none placeholder:text-[#8fa2cb]/40"
+                  class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-lg text-[11px] text-[#2d2b28] p-2 focus:outline-none focus:border-[#8f7556] resize-none placeholder:text-[#7a756f]/50"
                 ></textarea>
                 <div class="flex items-center gap-2">
-                  <button type="submit" class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-500">Simpan</button>
-                  <button type="button" onclick={cancelAdd} class="px-3 py-1 rounded-lg bg-[#22396f] text-[#8fa2cb] text-[10px] font-bold hover:text-[#fcf1d0]">Batal</button>
+                  <button type="submit" class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-500 shadow-xs">Simpan</button>
+                  <button type="button" onclick={cancelAdd} class="px-3 py-1 rounded-lg bg-[#efe9e3] text-[#7a756f] text-[10px] font-bold hover:text-[#2d2b28]">Batal</button>
                 </div>
               </form>
             {:else}
               <button
                 type="button"
                 onclick={() => (addingMemory = true)}
-                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-[#22396f]/60 text-[11px] text-[#8fa2cb] hover:text-[#fcf1d0] hover:border-[#fcf1d0]/30 transition"
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-[#d9cfc7] text-[11px] text-[#7a756f] hover:text-[#2d2b28] hover:border-[#8f7556] transition"
               >
                 <Plus size={13} /> Tambah memori baru
               </button>

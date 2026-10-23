@@ -39,18 +39,18 @@ export function getSlotLabel(slot: SlotTime): { label: string; time: string; ico
 export function getStatusStyle(status: string): { bg: string; text: string; border: string; label: string } {
   switch (status) {
     case 'SUBMITTED':
-      return { bg: 'bg-emerald-950/80', text: 'text-emerald-300', border: 'border-emerald-600', label: 'Bounty Submitted' };
+      return { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300', label: 'Bounty Submitted' };
     case 'UPLOADED':
-      return { bg: 'bg-teal-950/80', text: 'text-teal-300', border: 'border-teal-500', label: 'Video Uploaded' };
+      return { bg: 'bg-cyan-100', text: 'text-cyan-800', border: 'border-cyan-300', label: 'Video Uploaded' };
     case 'READY':
-      return { bg: 'bg-amber-950/80', text: 'text-amber-300', border: 'border-amber-600', label: 'Ready to Upload' };
+      return { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-300', label: 'Ready to Upload' };
     case 'ON_HOLD':
-      return { bg: 'bg-purple-950/80', text: 'text-purple-300', border: 'border-purple-600', label: 'On Hold' };
+      return { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300', label: 'On Hold' };
     case 'OFF':
-      return { bg: 'bg-slate-900', text: 'text-slate-400', border: 'border-slate-700', label: 'Off / Rest' };
+      return { bg: 'bg-slate-100', text: 'text-slate-700', border: 'border-slate-300', label: 'Off / Rest' };
     case 'DRAFT':
     default:
-      return { bg: 'bg-rose-950/80', text: 'text-rose-300', border: 'border-rose-600', label: 'Draft / Belum' };
+      return { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-rose-300', label: 'Draft / Belum' };
   }
 }
 
