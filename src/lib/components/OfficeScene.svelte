@@ -2,9 +2,9 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-  import { AGENCY_AGENTS, type AgentProfile } from '#lib/agents.js';
+  import { FALLBACK_AGENTS, type AgentProfile } from '#lib/agents.js';
 
-  let { onAgentClick }: { onAgentClick: (agent: AgentProfile) => void } = $props();
+  let { onAgentClick, agents = FALLBACK_AGENTS }: { onAgentClick: (agent: AgentProfile) => void; agents?: AgentProfile[] } = $props();
 
   let container: HTMLDivElement;
   let raf = 0;
@@ -198,7 +198,7 @@
       return group;
     }
 
-    for (const agent of AGENCY_AGENTS) {
+    for (const agent of agents) {
       const deskGroup = createDesk(agent);
       scene.add(deskGroup);
       desks.push({ agent, mesh: deskGroup });
@@ -234,7 +234,7 @@
         let obj: THREE.Object3D | null = hits[0].object;
         while (obj && !obj.userData?.agentId) obj = obj.parent;
         if (obj?.userData?.agentId) {
-          const agent = AGENCY_AGENTS.find(a => a.id === obj!.userData.agentId);
+          const agent = agents.find(a => a.id === obj!.userData.agentId);
           if (agent) onAgentClick(agent);
         }
       }

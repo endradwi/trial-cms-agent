@@ -42,6 +42,38 @@ export interface ActivityLog {
   created_at: string;
 }
 
+export interface AgentRow {
+  id: string;
+  slug: string;
+  name: string;
+  title: string;
+  role: string;
+  avatar_icon: string;
+  accent_color: string;
+  status: 'IDLE' | 'WORKING' | 'THINKING' | 'RESTING';
+  current_task: string | null;
+  personality: string | null;
+  desk_position: { x: number; y: number; z: number };
+  updated_at: string;
+}
+
+export interface AgentMemoryRow {
+  id: string;
+  agent_id: string;
+  category: string;
+  content: string;
+  updated_at: string;
+}
+
+export interface AgentSkillRow {
+  id: string;
+  agent_id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  active: boolean;
+}
+
 export interface ChannelCardData {
   channel: Channel;
   logs: ContentLog[];

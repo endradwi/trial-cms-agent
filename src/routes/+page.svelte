@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
+  import { onMount, onDestroy } from 'svelte';
+  import { goto, invalidateAll } from '$app/navigation';
   import { ChevronLeft, ChevronRight, AlertTriangle, Activity } from 'lucide-svelte';
+  import { createClient } from '@supabase/supabase-js';
   import ChannelCard from '#lib/components/ChannelCard.svelte';
   import EditSlotDialog from '#lib/components/EditSlotDialog.svelte';
   import AgentBrainDialog from '#lib/components/AgentBrainDialog.svelte';
@@ -11,6 +12,40 @@
 
   let { data } = $props();
 
+  // --- Agents from server (DB or fallback) ---
+  let agents = $derived(data.agents);
+
+  // --- Supabase Realtime (client-side, publishable key only) ---
+  let realtimeCleanup: (() => void) | null = null;
+
+  onMount(() => {
+    const sbUrl = data.supabaseUrl;
+    const sbKey = data.supabaseKey;
+    if (!sbUrl || !sbKey) return;
+
+    const sb = createClient(sbUrl, sbKey, { auth: { persistSession: false } });
+
+    const channel = sb.channel('agency-ops-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'agents' }, () => {
+        invalidateAll(); // re-run server load
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_memories' }, () => {
+        invalidateAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'content_logs' }, () => {
+        invalidateAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, () => {
+        invalidateAll();
+      })
+      .subscribe();
+
+    realtimeCleanup = () => { sb.removeChannel(channel); };
+  });
+
+  onDestroy(() => { realtimeCleanup?.(); });
+
+  // --- Channel / CMS state ---
   const categories = [
     { id: 'all', label: 'Semua' },
     { id: 'clipper_us', label: 'US Shorts' },
@@ -67,7 +102,7 @@
     dialogOpen = true;
   }
 
-  // 3D HQ (desktop only)
+  // --- 3D HQ (desktop only) ---
   let isDesktop = $state(false);
   let OfficeScene = $state<any>(null);
   let agentDialogOpen = $state(false);
@@ -76,22 +111,30 @@
   onMount(() => {
     const mq = window.matchMedia('(min-width: 768px)');
     isDesktop = mq.matches;
-    mq.addEventListener('change', (e) => (isDesktop = e.matches));
-
-    if (mq.matches) {
-      import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
-    }
-    mq.addEventListener('change', (e) => {
+    const mqHandler = (e: MediaQueryListEvent) => {
+      isDesktop = e.matches;
       if (e.matches && !OfficeScene) {
         import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
       }
-    });
+    };
+    mq.addEventListener('change', mqHandler);
+    if (mq.matches) {
+      import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
+    }
   });
 
   function onAgentClick(agent: AgentProfile) {
     selectedAgent = agent;
     agentDialogOpen = true;
   }
+
+  // Keep selectedAgent in sync when data refreshes (realtime)
+  $effect(() => {
+    if (selectedAgent && agents.length) {
+      const fresh = agents.find(a => a.slug === selectedAgent!.slug);
+      if (fresh) selectedAgent = fresh;
+    }
+  });
 
   const timeAgo = (iso: string) => {
     const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
@@ -128,7 +171,7 @@
 
   {#if isDesktop && OfficeScene}
     <section aria-label="Virtual HQ 3D" class="hidden md:block">
-      <OfficeScene {onAgentClick} />
+      <OfficeScene {onAgentClick} agents={agents} />
     </section>
   {/if}
 

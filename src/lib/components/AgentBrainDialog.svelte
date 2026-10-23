@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Dialog } from 'bits-ui';
-  import { X, Brain, Wrench, Sparkles, Activity, ShieldCheck, Flame } from 'lucide-svelte';
+  import { enhance } from '$app/forms';
+  import { X, Brain, Wrench, Sparkles, Activity, Plus, Pencil, Trash2, Check } from 'lucide-svelte';
   import type { AgentProfile } from '#lib/agents.js';
 
   let {
@@ -12,6 +13,20 @@
   } = $props();
 
   let activeTab = $state<'overview' | 'skills' | 'memories'>('overview');
+
+  // Memory editor state
+  let editingMemId = $state<string | null>(null);
+  let editingContent = $state('');
+  let addingMemory = $state(false);
+  let newCategory = $state('');
+  let newContent = $state('');
+
+  function startEdit(mem: { id?: string; content: string }) {
+    editingMemId = mem.id ?? null;
+    editingContent = mem.content;
+  }
+  function cancelEdit() { editingMemId = null; editingContent = ''; }
+  function cancelAdd() { addingMemory = false; newCategory = ''; newContent = ''; }
 
   const statusBadge = $derived.by(() => {
     switch (agent?.status) {
@@ -92,7 +107,7 @@
           </button>
           <button
             type="button"
-            onclick={() => activeTab = 'memories'}
+            onclick={() => { activeTab = 'memories'; cancelEdit(); cancelAdd(); }}
             class="py-1.5 px-2 rounded-lg transition flex items-center justify-center gap-1.5 {activeTab === 'memories' ? 'bg-[#22396f] text-[#fcf1d0] shadow' : 'text-[#8fa2cb] hover:text-[#fcf1d0]'}"
           >
             <Sparkles size={13} />
@@ -133,18 +148,81 @@
             {/each}
           </div>
         {:else if activeTab === 'memories'}
-          <div class="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
+          <div class="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1">
             {#each agent.memories as mem}
-              <div class="p-3 rounded-xl bg-[#010736] border border-[#22396f]/30 flex flex-col gap-1 text-xs">
+              <div class="p-3 rounded-xl bg-[#010736] border border-[#22396f]/30 flex flex-col gap-1 text-xs group">
                 <div class="flex items-center justify-between text-[10px]">
                   <span class="font-bold text-[#fcf1d0] uppercase tracking-wider">🏷️ {mem.category}</span>
-                  <span class="text-[#8fa2cb]/60">Durable Fact</span>
+                  {#if mem.id}
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {#if editingMemId === mem.id}
+                        <form method="POST" action="?/updateMemory" use:enhance={() => { return async ({ update }) => { cancelEdit(); await update(); }; }}>
+                          <input type="hidden" name="id" value={mem.id} />
+                          <input type="hidden" name="content" value={editingContent} />
+                          <button type="submit" class="p-0.5 rounded text-emerald-400 hover:bg-emerald-950" title="Simpan"><Check size={12} /></button>
+                        </form>
+                        <button type="button" onclick={cancelEdit} class="p-0.5 rounded text-[#8fa2cb] hover:bg-[#22396f]/30" title="Batal"><X size={12} /></button>
+                      {:else}
+                        <button type="button" onclick={() => startEdit(mem)} class="p-0.5 rounded text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#22396f]/30" title="Edit"><Pencil size={12} /></button>
+                        <form method="POST" action="?/deleteMemory" use:enhance>
+                          <input type="hidden" name="id" value={mem.id} />
+                          <button type="submit" class="p-0.5 rounded text-rose-400 hover:bg-rose-950" title="Hapus"><Trash2 size={12} /></button>
+                        </form>
+                      {/if}
+                    </div>
+                  {/if}
                 </div>
-                <p class="text-[#c7d5f5] text-[11px] leading-relaxed pl-1 pt-0.5">
-                  • {mem.content}
-                </p>
+                {#if editingMemId === mem.id}
+                  <textarea
+                    bind:value={editingContent}
+                    rows={2}
+                    class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 mt-1 focus:outline-none focus:border-[#fcf1d0]/40 resize-none"
+                  ></textarea>
+                {:else}
+                  <p class="text-[#c7d5f5] text-[11px] leading-relaxed pl-1 pt-0.5">
+                    • {mem.content}
+                  </p>
+                {/if}
               </div>
+            {:else}
+              <p class="text-[11px] text-[#8fa2cb]">Belum ada memori tersimpan.</p>
             {/each}
+
+            <!-- Add new memory form -->
+            {#if addingMemory}
+              <form method="POST" action="?/addMemory" use:enhance={() => { return async ({ update }) => { cancelAdd(); await update(); }; }}
+                class="p-3 rounded-xl bg-[#010736] border border-emerald-800/40 flex flex-col gap-2"
+              >
+                <input type="hidden" name="agent_id" value={agent.id} />
+                <input
+                  bind:value={newCategory}
+                  name="category"
+                  placeholder="Kategori (misal: rule, ops, infra)"
+                  required
+                  class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 focus:outline-none focus:border-[#fcf1d0]/40 placeholder:text-[#8fa2cb]/40"
+                />
+                <textarea
+                  bind:value={newContent}
+                  name="content"
+                  placeholder="Isi memori baru…"
+                  required
+                  rows={2}
+                  class="w-full bg-[#0d1c42] border border-[#22396f] rounded-lg text-[11px] text-[#fcf1d0] p-2 focus:outline-none focus:border-[#fcf1d0]/40 resize-none placeholder:text-[#8fa2cb]/40"
+                ></textarea>
+                <div class="flex items-center gap-2">
+                  <button type="submit" class="px-3 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold hover:bg-emerald-500">Simpan</button>
+                  <button type="button" onclick={cancelAdd} class="px-3 py-1 rounded-lg bg-[#22396f] text-[#8fa2cb] text-[10px] font-bold hover:text-[#fcf1d0]">Batal</button>
+                </div>
+              </form>
+            {:else}
+              <button
+                type="button"
+                onclick={() => (addingMemory = true)}
+                class="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-dashed border-[#22396f]/60 text-[11px] text-[#8fa2cb] hover:text-[#fcf1d0] hover:border-[#fcf1d0]/30 transition"
+              >
+                <Plus size={13} /> Tambah memori baru
+              </button>
+            {/if}
           </div>
         {/if}
       {/if}
