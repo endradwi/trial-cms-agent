@@ -1,247 +1,353 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { goto, invalidateAll } from '$app/navigation';
-  import { ChevronLeft, ChevronRight, AlertTriangle, Activity } from 'lucide-svelte';
+  import { enhance } from '$app/forms';
   import { createClient } from '@supabase/supabase-js';
-  import ChannelCard from '#lib/components/ChannelCard.svelte';
-  import EditSlotDialog from '#lib/components/EditSlotDialog.svelte';
-  import AgentBrainDialog from '#lib/components/AgentBrainDialog.svelte';
-  import { getExpectedSlots } from '#lib/slots.js';
-  import type { Channel, ContentLog, SlotTime } from '#lib/types.js';
-  import type { AgentProfile } from '#lib/agents.js';
+  import { calculateLiveProgress } from '#lib/slots.js';
+  import type { ActivityLog, Channel, ContentLog } from '#lib/types.js';
+  import type { ChannelViewSummary } from '#lib/server/channelViews.js';
 
   let { data } = $props();
 
-  // --- Agents from server (DB or fallback) ---
-  let agents = $derived(data.agents);
+  let isRefreshing = $state(false);
+  let logFilter = $state<'ALL' | 'UPLOAD' | 'SUBMITTED' | 'MEMORY' | 'SYSTEM'>('ALL');
+  let liveLogs = $state<ActivityLog[]>([]);
 
-  // --- Supabase Realtime (client-side, publishable key only) ---
-  let realtimeCleanup: (() => void) | null = null;
+  $effect(() => {
+    liveLogs = data.activity;
+  });
 
+  // Calculate live views aggregate
+  let viewsData = $derived<Record<string, ChannelViewSummary>>(data.channelViews ?? {});
+  let totalLiveViews = $derived(
+    Object.values(viewsData).reduce((acc, curr) => acc + (curr.totalViewsCount || 0), 0)
+  );
+
+  let progress = $derived(calculateLiveProgress(data.channels, data.logs, data.selectedDate));
+
+  // Filter logs
+  let filteredLogs = $derived(
+    liveLogs.filter((l) => {
+      if (logFilter === 'ALL') return true;
+      if (logFilter === 'UPLOAD') return l.action.includes('UPLOADED');
+      if (logFilter === 'SUBMITTED') return l.action.includes('SUBMITTED');
+      if (logFilter === 'MEMORY') return l.action.includes('MEMORY');
+      return true;
+    })
+  );
+
+  // Supabase Realtime Listener for Activity Logs
+  let supabaseSub: any;
   onMount(() => {
-    const sbUrl = data.supabaseUrl;
-    const sbKey = data.supabaseKey;
-    if (!sbUrl || !sbKey) return;
-
-    const sb = createClient(sbUrl, sbKey, { auth: { persistSession: false } });
-
-    const channel = sb.channel('agency-ops-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'agents' }, () => {
-        invalidateAll(); // re-run server load
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'agent_memories' }, () => {
-        invalidateAll();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'content_logs' }, () => {
-        invalidateAll();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'activity_logs' }, () => {
-        invalidateAll();
-      })
-      .subscribe();
-
-    realtimeCleanup = () => { sb.removeChannel(channel); };
-  });
-
-  onDestroy(() => { realtimeCleanup?.(); });
-
-  // --- Channel / CMS state ---
-  const categories = [
-    { id: 'all', label: 'Semua' },
-    { id: 'clipper_us', label: 'US Shorts' },
-    { id: 'clipper_indo', label: 'Indo' },
-    { id: 'affiliate', label: 'Affiliate' }
-  ] as const;
-  let filter = $state<(typeof categories)[number]['id']>('all');
-
-  const logsByChannel = $derived.by(() => {
-    const m = new Map<string, ContentLog[]>();
-    for (const l of data.logs) m.set(l.channel_id, [...(m.get(l.channel_id) ?? []), l]);
-    return m;
-  });
-
-  const stats = $derived.by(() => {
-    let expected = 0, live = 0, bountyExpected = 0, submitted = 0;
-    for (const ch of data.channels) {
-      const slots = getExpectedSlots(ch.category, data.selectedDate);
-      const logs = logsByChannel.get(ch.id) ?? [];
-      const isBounty = !!ch.bounty_platform && ch.bounty_platform !== 'Internal' && ch.category === 'clipper_us';
-      for (const slot of slots) {
-        const st = logs.find((l) => l.slot === slot)?.status;
-        if (st === 'OFF') continue;
-        expected++;
-        if (isBounty) bountyExpected++;
-        if (st === 'UPLOADED' || st === 'SUBMITTED') live++;
-        if (isBounty && st === 'SUBMITTED') submitted++;
+    liveLogs = data.activity;
+    if (data.supabaseUrl && data.supabaseKey) {
+      try {
+        const client = createClient(data.supabaseUrl, data.supabaseKey);
+        supabaseSub = client
+          .channel('analytics_activity_realtime')
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs' }, (payload) => {
+            const newLog = payload.new as ActivityLog;
+            liveLogs = [newLog, ...liveLogs.slice(0, 49)];
+          })
+          .subscribe();
+      } catch (err) {
+        console.error('Realtime activity stream error:', err);
       }
     }
-    return { expected, live, bountyExpected, submitted, pct: expected ? Math.round((live / expected) * 100) : 0 };
   });
 
-  const jakartaHour = () => Number(new Date().toLocaleString('en-US', { timeZone: 'Asia/Jakarta', hour: 'numeric', hour12: false }));
-  const overdue = $derived(
-    (data.selectedDate < data.today || (data.selectedDate === data.today && jakartaHour() >= 21)) && stats.live < stats.expected
-  );
-
-  const visible = $derived(filter === 'all' ? data.channels : data.channels.filter((c) => c.category === filter));
-
-  function shiftDate(days: number) {
-    const d = new Date(data.selectedDate + 'T00:00:00Z');
-    d.setUTCDate(d.getUTCDate() + days);
-    goto(`?date=${d.toISOString().slice(0, 10)}`, { reset: false });
-  }
-
-  const dateLabel = $derived(
-    new Date(data.selectedDate + 'T00:00:00Z').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' })
-  );
-
-  let dialogOpen = $state(false);
-  let editing = $state<{ channel: Channel; slot: SlotTime; log?: ContentLog } | null>(null);
-  function onEditSlot(channel: Channel, slot: SlotTime, log?: ContentLog) {
-    editing = { channel, slot, log };
-    dialogOpen = true;
-  }
-
-  // --- 3D HQ (desktop only) ---
-  let isDesktop = $state(false);
-  let OfficeScene = $state<any>(null);
-  let agentDialogOpen = $state(false);
-  let selectedAgentSlug = $state<string | null>(null);
-  let selectedAgent = $derived(
-    selectedAgentSlug ? (agents.find((a) => a.slug === selectedAgentSlug) ?? null) : null
-  );
-
-  onMount(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    isDesktop = mq.matches;
-    const mqHandler = (e: MediaQueryListEvent) => {
-      isDesktop = e.matches;
-      if (e.matches && !OfficeScene) {
-        import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
-      }
-    };
-    mq.addEventListener('change', mqHandler);
-    if (mq.matches) {
-      import('#lib/components/OfficeScene.svelte').then((m) => (OfficeScene = m.default));
-    }
+  onDestroy(() => {
+    if (supabaseSub) supabaseSub.unsubscribe();
   });
-
-  function onAgentClick(agent: AgentProfile) {
-    selectedAgentSlug = agent.slug;
-    agentDialogOpen = true;
-  }
-
-  const timeAgo = (iso: string) => {
-    const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
-    return m < 1 ? 'baru saja' : m < 60 ? `${m}m lalu` : m < 1440 ? `${Math.floor(m / 60)}j lalu` : `${Math.floor(m / 1440)}h lalu`;
-  };
 </script>
 
-<main class="mx-auto max-w-7xl px-4 py-5 font-mono flex flex-col gap-4">
-  <header class="flex flex-wrap items-center justify-between gap-3">
+<div class="p-6 max-w-7xl mx-auto space-y-6">
+  <!-- Top Welcome & Telemetry Header -->
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-[#0d1c42]/80 border border-[#22396f] p-6 rounded-2xl shadow-xl">
     <div>
-      <h1 class="text-base font-bold text-[#fcf1d0]">Agency Ops</h1>
-      <p class="text-[11px] text-[#8fa2cb]">Progress upload harian {data.channels.length} channel</p>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs font-mono text-[#00e5ff] uppercase tracking-wider font-semibold">Live Operational Telemetry</span>
+      </div>
+      <h1 class="text-2xl font-bold tracking-tight text-[#fcf1d0] mt-1">
+        Command Center & Live Channel Analytics
+      </h1>
+      <p class="text-xs text-[#8fa2cb] mt-1 font-mono">
+        Status real-time 13 channel media sosial, performa views terkini, & live activity stream para AI agent.
+      </p>
     </div>
 
-    <div class="flex items-center gap-1 rounded-xl border border-[#22396f] bg-[#0d1c42] p-1">
-      <button type="button" onclick={() => shiftDate(-1)} aria-label="Hari sebelumnya" class="p-1.5 rounded-lg text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#22396f]/40">
-        <ChevronLeft size={16} />
-      </button>
-      <input
-        type="date"
-        value={data.selectedDate}
-        onchange={(e) => goto(`?date=${e.currentTarget.value}`, { reset: false })}
-        aria-label="Pilih tanggal"
-        class="bg-transparent text-xs text-[#fcf1d0] px-1 [color-scheme:dark] focus:outline-none"
-      />
-      <button type="button" onclick={() => shiftDate(1)} aria-label="Hari berikutnya" class="p-1.5 rounded-lg text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#22396f]/40">
-        <ChevronRight size={16} />
-      </button>
-      {#if data.selectedDate !== data.today}
-        <a href="/" class="text-[10px] font-bold px-2 py-1 rounded-lg bg-[#22396f] text-[#fcf1d0]">Hari ini</a>
-      {/if}
-    </div>
-  </header>
-
-  {#if isDesktop && OfficeScene}
-    <section aria-label="Virtual HQ 3D" class="hidden md:block">
-      <OfficeScene {onAgentClick} agents={agents} />
-    </section>
-  {/if}
-
-  {#if data.error}
-    <p role="alert" class="text-xs text-rose-300 bg-rose-950/60 border border-rose-800 rounded-xl px-4 py-3">Database error: {data.error}</p>
-  {/if}
-
-  <section class="grid grid-cols-1 sm:grid-cols-3 gap-3" aria-label="Ringkasan hari ini">
-    <div class="sm:col-span-2 rounded-2xl bg-[#0d1c42] border border-[#22396f]/60 p-4">
-      <div class="flex items-baseline justify-between">
-        <span class="text-[11px] text-[#8fa2cb] capitalize">{dateLabel}</span>
-        <span class="text-xs font-bold text-[#fcf1d0]">{stats.pct}%</span>
-      </div>
-      <div class="mt-1 text-2xl font-bold text-[#fcf1d0]">
-        {stats.live}<span class="text-[#8fa2cb] text-base">/{stats.expected} video live</span>
-      </div>
-      <div class="mt-3 h-2 rounded-full bg-[#010736] overflow-hidden" role="progressbar" aria-valuenow={stats.pct} aria-valuemin={0} aria-valuemax={100}>
-        <div class="h-full rounded-full transition-all {stats.pct === 100 ? 'bg-emerald-400' : 'bg-[#fcf1d0]'}" style="width: {stats.pct}%"></div>
-      </div>
-    </div>
-
-    <div class="rounded-2xl bg-[#0d1c42] border p-4 flex flex-col justify-between {overdue ? 'border-rose-600' : 'border-[#22396f]/60'}">
-      <span class="text-[11px] text-[#8fa2cb]">Bounty submitted</span>
-      <div class="text-2xl font-bold text-[#fcf1d0]">
-        {stats.submitted}<span class="text-[#8fa2cb] text-base">/{stats.bountyExpected}</span>
-      </div>
-      {#if overdue}
-        <span class="mt-1 flex items-center gap-1 text-[11px] font-bold text-rose-300">
-          <AlertTriangle size={12} /> {stats.expected - stats.live} slot lewat jam 21:00
-        </span>
-      {/if}
-    </div>
-  </section>
-
-  <nav class="flex gap-1.5 overflow-x-auto pb-1" aria-label="Filter lini bisnis">
-    {#each categories as c}
+    <!-- Refresh Live Views Form Action -->
+    <form
+      method="POST"
+      action="?/refreshViews"
+      use:enhance={() => {
+        isRefreshing = true;
+        return async ({ update }) => {
+          await update();
+          isRefreshing = false;
+        };
+      }}
+    >
       <button
-        type="button"
-        onclick={() => (filter = c.id)}
-        aria-pressed={filter === c.id}
-        class="shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition {filter === c.id ? 'bg-[#fcf1d0] text-[#010736] border-[#fcf1d0]' : 'bg-[#0d1c42] text-[#8fa2cb] border-[#22396f]/60 hover:text-[#fcf1d0]'}"
+        type="submit"
+        disabled={isRefreshing}
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#22396f] to-[#0d1c42] hover:from-[#314f96] hover:to-[#172c63] text-xs font-mono font-bold text-[#fcf1d0] border border-[#3b82f6]/50 shadow-lg shadow-[#00e5ff]/5 transition-all disabled:opacity-50"
       >
-        {c.label}
+        <span class={isRefreshing ? 'animate-spin' : ''}>🔄</span>
+        <span>{isRefreshing ? 'Scraping YouTube Views...' : 'Refresh Live Views'}</span>
       </button>
-    {/each}
-  </nav>
-
-  <div class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-4 items-start">
-    <section class="grid grid-cols-1 md:grid-cols-2 gap-3" aria-label="Channel">
-      {#each visible as channel (channel.id)}
-        <ChannelCard {channel} date={data.selectedDate} logs={logsByChannel.get(channel.id) ?? []} {onEditSlot} />
-      {:else}
-        <p class="text-xs text-[#8fa2cb] col-span-full">Belum ada channel aktif.</p>
-      {/each}
-    </section>
-
-    <aside class="rounded-2xl bg-[#0d1c42] border border-[#22396f]/60 p-4 lg:sticky lg:top-4">
-      <h2 class="flex items-center gap-1.5 text-xs font-bold text-[#fcf1d0] mb-3"><Activity size={13} /> Aktivitas terbaru</h2>
-      <ul class="flex flex-col gap-2.5">
-        {#each data.activity as a (a.id)}
-          <li class="text-[11px] leading-snug border-l-2 border-[#22396f] pl-2.5">
-            <div class="text-[#fcf1d0]"><b>{a.actor}</b> · {a.channel_slug} · {a.action}</div>
-            {#if a.details}<div class="text-[#8fa2cb] truncate">{a.details}</div>{/if}
-            <div class="text-[10px] text-[#8fa2cb]/60">{timeAgo(a.created_at)}</div>
-          </li>
-        {:else}
-          <li class="text-[11px] text-[#8fa2cb]">Belum ada aktivitas.</li>
-        {/each}
-      </ul>
-    </aside>
+    </form>
   </div>
-</main>
 
-{#if editing}
-  <EditSlotDialog bind:open={dialogOpen} onClose={() => { dialogOpen = false; editing = null; }} channel={editing.channel} slot={editing.slot} date={data.selectedDate} log={editing.log} />
-{/if}
+  <!-- KPI Metric Summary Cards (Supabase Style) -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Card 1: Total Live Views -->
+    <div class="bg-[#0d1c42] border border-[#22396f] p-5 rounded-2xl shadow flex flex-col justify-between relative overflow-hidden">
+      <div>
+        <div class="flex items-center justify-between text-xs font-mono text-[#8fa2cb] mb-1">
+          <span>TOTAL VIEWS TERPANTAU</span>
+          <span class="text-base">👁️</span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#00e5ff] tracking-tight">
+          {totalLiveViews.toLocaleString('id-ID')}+
+        </div>
+      </div>
+      <div class="text-[11px] font-mono text-emerald-400 mt-3 flex items-center gap-1">
+        <span>●</span>
+        <span>Live scrape dari YouTube Shorts</span>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#00e5ff]/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
 
-<AgentBrainDialog bind:open={agentDialogOpen} agent={selectedAgent} />
+    <!-- Card 2: SOP Uploads Today -->
+    <div class="bg-[#0d1c42] border border-[#22396f] p-5 rounded-2xl shadow flex flex-col justify-between relative overflow-hidden">
+      <div>
+        <div class="flex items-center justify-between text-xs font-mono text-[#8fa2cb] mb-1">
+          <span>PROGRESS UPLOAD HARI INI</span>
+          <span class="text-base">🎬</span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#10b981] tracking-tight">
+          {progress.completedSlots} / {progress.totalSlots}
+          <span class="text-xs text-[#8fa2cb] font-normal">({progress.percentage}%)</span>
+        </div>
+      </div>
+      <div class="w-full bg-[#010736] h-1.5 rounded-full mt-3 overflow-hidden">
+        <div class="bg-[#10b981] h-full transition-all duration-500" style="width: {progress.percentage}%"></div>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#10b981]/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Card 3: Bounty Submissions -->
+    <div class="bg-[#0d1c42] border border-[#22396f] p-5 rounded-2xl shadow flex flex-col justify-between relative overflow-hidden">
+      <div>
+        <div class="flex items-center justify-between text-xs font-mono text-[#8fa2cb] mb-1">
+          <span>BOUNTY SUBMITTED</span>
+          <span class="text-base">🎯</span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#fcf1d0] tracking-tight">
+          {progress.bountySubmitted} clips
+        </div>
+      </div>
+      <div class="text-[11px] font-mono text-[#8fa2cb] mt-3">
+        Whop • ClipHaus • Content Rewards • Reach
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#fcf1d0]/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+
+    <!-- Card 4: AI Workforce -->
+    <div class="bg-[#0d1c42] border border-[#22396f] p-5 rounded-2xl shadow flex flex-col justify-between relative overflow-hidden">
+      <div>
+        <div class="flex items-center justify-between text-xs font-mono text-[#8fa2cb] mb-1">
+          <span>AI AGENT WORKFORCE</span>
+          <span class="text-base">🤖</span>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#fcf1d0] tracking-tight">
+          7 / 7 Online
+        </div>
+      </div>
+      <div class="text-[11px] font-mono text-emerald-400 mt-3 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Coco, Satria, Dimas, Salsa, Layla...</span>
+      </div>
+      <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-purple-500/5 rounded-full blur-xl pointer-events-none"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: LIVE CHANNEL VIEWS (Biar lu gak perlu nanya si Coco lagi!) -->
+  <div class="bg-[#0d1c42] border border-[#22396f] rounded-2xl p-6 shadow-xl space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#22396f]/60 pb-4">
+      <div>
+        <h2 class="text-lg font-bold text-[#fcf1d0] flex items-center gap-2">
+          <span>📺</span>
+          <span>Live Views per Channel (Real-Time YouTube Shorts & Affiliate)</span>
+        </h2>
+        <p class="text-xs text-[#8fa2cb] font-mono mt-0.5">
+          Data real view scrape langsung dari YouTube Shorts tiap channel agensi
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs font-mono text-[#8fa2cb]">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Monitored: 13 Channels</span>
+      </div>
+    </div>
+
+    <!-- Grid of Live Channel View Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {#each data.channels as ch (ch.id)}
+        {@const stat = (ch.handle ? viewsData[ch.handle] : undefined) ?? viewsData['@' + ch.slug]}
+        <div class="bg-[#071330] border border-[#22396f]/70 hover:border-[#00e5ff]/50 rounded-xl p-4 flex flex-col justify-between transition-all group">
+          <div>
+            <!-- Channel Header -->
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <h3 class="font-bold text-sm text-[#fcf1d0] group-hover:text-[#00e5ff] transition-colors flex items-center gap-1.5">
+                  <span>{ch.name}</span>
+                </h3>
+                <span class="text-[11px] font-mono text-[#8fa2cb]">{ch.handle}</span>
+              </div>
+
+              <!-- Live Views Pill -->
+              {#if stat?.latestViewsText}
+                <span class="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-[#00e5ff]/10 text-[#00e5ff] border border-[#00e5ff]/30 shadow">
+                  🔥 {stat.latestViewsText}
+                </span>
+              {:else}
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono bg-[#22396f]/40 text-[#8fa2cb] border border-[#22396f]/40">
+                  {ch.platform === 'tiktok' ? 'TikTok Indo' : 'Pending Index'}
+                </span>
+              {/if}
+            </div>
+
+            <!-- Niche & Bounty Sponsor -->
+            <div class="text-[11px] font-mono text-[#8fa2cb]/80 mb-3 bg-[#010736] px-2.5 py-1.5 rounded-lg border border-[#22396f]/30">
+              <span class="text-[#00e5ff] font-semibold">{ch.bounty_platform || 'Affiliate'}</span> • {ch.niche}
+            </div>
+
+            <!-- Latest Video Title & Link -->
+            {#if stat?.latestVideo}
+              <div class="bg-[#0d1c42]/60 p-2.5 rounded-lg border border-[#22396f]/40 mb-3">
+                <div class="text-[10px] font-mono text-[#8fa2cb]/70 uppercase tracking-wider mb-1 flex items-center justify-between">
+                  <span>Video Terbaru:</span>
+                  <a
+                    href="https://www.youtube.com/shorts/{stat.latestVideo.id}"
+                    target="_blank"
+                    rel="noreferrer"
+                    class="text-[#00e5ff] hover:underline flex items-center gap-0.5"
+                  >
+                    <span>Buka Shorts</span>
+                    <span>↗</span>
+                  </a>
+                </div>
+                <p class="text-xs text-[#fcf1d0] font-medium line-clamp-2 leading-snug">
+                  {stat.latestVideo.title}
+                </p>
+              </div>
+            {/if}
+          </div>
+
+          <!-- Footer card -->
+          <div class="pt-2 border-t border-[#22396f]/30 flex items-center justify-between text-[11px] font-mono text-[#8fa2cb]">
+            <span class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full {stat ? 'bg-emerald-400' : 'bg-blue-400'}"></span>
+              <span>{ch.category === 'clipper_us' ? 'Clipper US' : ch.category === 'clipper_indo' ? 'Clipper Indo' : 'Affiliate US'}</span>
+            </span>
+            <a href="/tasks" class="text-[#00e5ff] hover:underline">
+              Kelola SOP →
+            </a>
+          </div>
+        </div>
+      {/each}
+    </div>
+  </div>
+
+  <!-- SECTION: LIVE LOG EXPLORER (Supabase Logs Explorer Style) -->
+  <div class="bg-[#0d1c42] border border-[#22396f] rounded-2xl p-6 shadow-xl space-y-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#22396f]/60 pb-4">
+      <div>
+        <h2 class="text-lg font-bold text-[#fcf1d0] flex items-center gap-2">
+          <span>📜</span>
+          <span>Live Operations & Agent Event Stream</span>
+        </h2>
+        <p class="text-xs text-[#8fa2cb] font-mono mt-0.5">
+          Realtime event log dari webhook Telegram, upload SOP, dan inter-agent dispatcher
+        </p>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        <button
+          onclick={() => (logFilter = 'ALL')}
+          class="px-2.5 py-1 rounded-md text-[11px] font-mono transition-colors {logFilter === 'ALL'
+            ? 'bg-[#22396f] text-[#fcf1d0] font-bold border border-[#00e5ff]/50'
+            : 'text-[#8fa2cb] hover:bg-[#071330]'}"
+        >
+          Semua
+        </button>
+        <button
+          onclick={() => (logFilter = 'UPLOAD')}
+          class="px-2.5 py-1 rounded-md text-[11px] font-mono transition-colors {logFilter === 'UPLOAD'
+            ? 'bg-[#22396f] text-[#10b981] font-bold border border-[#10b981]/50'
+            : 'text-[#8fa2cb] hover:bg-[#071330]'}"
+        >
+          Uploads
+        </button>
+        <button
+          onclick={() => (logFilter = 'SUBMITTED')}
+          class="px-2.5 py-1 rounded-md text-[11px] font-mono transition-colors {logFilter === 'SUBMITTED'
+            ? 'bg-[#22396f] text-[#00e5ff] font-bold border border-[#00e5ff]/50'
+            : 'text-[#8fa2cb] hover:bg-[#071330]'}"
+        >
+          Bounties
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Terminal Stream Container -->
+    <div class="bg-[#050e24] border border-[#22396f]/60 rounded-xl p-4 font-mono text-xs max-h-80 overflow-y-auto space-y-2 select-text">
+      {#if filteredLogs.length === 0}
+        <div class="text-[#8fa2cb]/60 py-6 text-center">
+          Belum ada aktivitas yang tercatat untuk filter ini.
+        </div>
+      {:else}
+        {#each filteredLogs as log (log.id)}
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 rounded-lg bg-[#071330]/60 hover:bg-[#0d1c42] border border-[#22396f]/30 transition-colors">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-[10px] text-[#8fa2cb]/60 shrink-0">
+                {new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
+
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 {log.action.includes('UPLOADED')
+                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                : log.action.includes('SUBMITTED')
+                ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/30'
+                : 'bg-blue-500/10 text-blue-400 border border-blue-500/30'}">
+                {log.action}
+              </span>
+
+              <span class="text-[#fcf1d0] font-semibold shrink-0">
+                {log.actor || 'System'}
+              </span>
+
+              {#if log.channel_slug}
+                <span class="text-[10px] text-[#8fa2cb] bg-[#010736] px-1.5 py-0.2 rounded border border-[#22396f]/40 shrink-0">
+                  {log.channel_slug}
+                </span>
+              {/if}
+
+              {#if log.details}
+                <span class="text-[#8fa2cb] truncate text-[11px]">
+                  {log.details}
+                </span>
+              {/if}
+            </div>
+
+            <span class="text-[9px] text-emerald-400/80 shrink-0 self-end sm:self-center">
+              ● live
+            </span>
+          </div>
+        {/each}
+      {/if}
+    </div>
+  </div>
+</div>

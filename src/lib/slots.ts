@@ -53,3 +53,34 @@ export function getStatusStyle(status: string): { bg: string; text: string; bord
       return { bg: 'bg-rose-950/80', text: 'text-rose-300', border: 'border-rose-600', label: 'Draft / Belum' };
   }
 }
+
+export function totalSlotsForChannel(channel: { category: string }, dateStr: string): number {
+  return getExpectedSlots(channel.category, dateStr).length;
+}
+
+export function calculateLiveProgress(
+  channels: Array<{ id: string; category: string; bounty_platform?: string | null }>,
+  logs: Array<{ channel_id: string; slot: string; status: string }>,
+  dateStr: string
+) {
+  let totalSlots = 0;
+  let completedSlots = 0;
+  let bountySubmitted = 0;
+
+  for (const ch of channels) {
+    const slots = getExpectedSlots(ch.category, dateStr);
+    const chLogs = logs.filter((l) => l.channel_id === ch.id);
+    const isBounty = !!ch.bounty_platform && ch.bounty_platform !== 'Internal' && ch.category === 'clipper_us';
+
+    for (const slot of slots) {
+      const st = chLogs.find((l) => l.slot === slot)?.status;
+      if (st === 'OFF') continue;
+      totalSlots++;
+      if (st === 'UPLOADED' || st === 'SUBMITTED') completedSlots++;
+      if (isBounty && st === 'SUBMITTED') bountySubmitted++;
+    }
+  }
+
+  const percentage = totalSlots > 0 ? Math.round((completedSlots / totalSlots) * 100) : 0;
+  return { totalSlots, completedSlots, percentage, bountySubmitted };
+}

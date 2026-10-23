@@ -4,28 +4,32 @@ import { supabase } from '#lib/server/supabase.js';
 import { sendTelegramOpsAlert } from '#lib/server/telegram.js';
 import { slotUpdateSchema } from '#lib/schemas.js';
 import { toAgentProfile, FALLBACK_AGENTS } from '#lib/agents.js';
+import { getLiveChannelViews } from '#lib/server/channelViews.js';
 import type { ActivityLog, Channel, ContentLog, AgentRow, AgentMemoryRow, AgentSkillRow } from '#lib/types.js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$app/env/private';
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 
+const execAsync = promisify(exec);
 const jakartaToday = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 export const load: PageServerLoad = async ({ url }) => {
   const param = url.searchParams.get('date');
   const selectedDate = param && /^\d{4}-\d{2}-\d{2}$/.test(param) ? param : jakartaToday();
 
-  const [ch, logs, activity, agentsRes, skillsRes, memoriesRes] = await Promise.all([
+  const [ch, logs, activity, agentsRes, skillsRes, memoriesRes, channelViews] = await Promise.all([
     supabase.from('channels').select('*').eq('active', true).order('sort_order'),
     supabase.from('content_logs').select('*').eq('date', selectedDate),
-    supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(15),
+    supabase.from('activity_logs').select('*').order('created_at', { ascending: false }).limit(40),
     supabase.from('agents').select('*').order('slug'),
     supabase.from('agent_skills').select('*').eq('active', true),
-    supabase.from('agent_memories').select('*').order('created_at')
+    supabase.from('agent_memories').select('*').order('created_at'),
+    getLiveChannelViews()
   ]);
 
   const error = ch.error?.message || logs.error?.message || activity.error?.message || null;
   if (error) console.error('Supabase load error:', error);
 
-  // Graceful fallback: if agents table doesn't exist, use hardcoded
   const agents = agentsRes.error
     ? FALLBACK_AGENTS
     : (agentsRes.data as AgentRow[]).map(row =>
@@ -39,6 +43,7 @@ export const load: PageServerLoad = async ({ url }) => {
     logs: (logs.data ?? []) as ContentLog[],
     activity: (activity.data ?? []) as ActivityLog[],
     agents,
+    channelViews,
     supabaseUrl: PUBLIC_SUPABASE_URL,
     supabaseKey: PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     error
@@ -46,6 +51,16 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
+  refreshViews: async () => {
+    try {
+      await execAsync('python3 /opt/clipper/audit_all_channels.py', { timeout: 20000 });
+      return { success: true };
+    } catch (err: any) {
+      console.error('Failed to audit channels:', err);
+      return fail(500, { error: err.message || 'Gagal refresh views' });
+    }
+  },
+
   updateSlot: async ({ request }) => {
     const parsed = slotUpdateSchema.safeParse(Object.fromEntries(await request.formData()));
     if (!parsed.success) {
