@@ -6,12 +6,13 @@
 
   let { data, children } = $props();
 
-  let sidebarOpen = $state(true);
+  let sidebarOpen = $state(false);
   let currentTime = $state('');
   let isRealtimeActive = $state(false);
 
   // Clock
   onMount(() => {
+    sidebarOpen = window.innerWidth >= 768;
     const updateTime = () => {
       currentTime = new Date().toLocaleTimeString('id-ID', {
         timeZone: 'Asia/Jakarta',
@@ -85,9 +86,21 @@
 </svelte:head>
 
 <div class="h-screen w-screen overflow-hidden flex bg-[#010736] text-[#fcf1d0] font-sans antialiased selection:bg-[#22396f] selection:text-[#fcf1d0]">
+  <!-- Mobile Backdrop Overlay -->
+  {#if sidebarOpen}
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      class="fixed inset-0 bg-black/60 z-20 md:hidden backdrop-blur-sm"
+      onclick={() => (sidebarOpen = false)}
+    ></div>
+  {/if}
+
   <!-- Supabase-style Sidebar -->
   <aside
-    class="flex flex-col border-r border-[#22396f]/50 bg-[#071330] transition-all duration-200 z-30 shrink-0 {sidebarOpen ? 'w-64' : 'w-16'}"
+    class="fixed inset-y-0 left-0 md:static flex flex-col border-r border-[#22396f]/50 bg-[#071330] transition-all duration-200 z-30 shrink-0 {sidebarOpen
+      ? 'w-64 translate-x-0'
+      : '-translate-x-full md:translate-x-0 md:w-16'}"
   >
     <!-- Brand / Project Header -->
     <div class="h-14 border-b border-[#22396f]/50 flex items-center justify-between px-3.5">
@@ -132,6 +145,11 @@
         {@const active = isActive(item.href, page.url.pathname)}
         <a
           href={item.href}
+          onclick={() => {
+            if (typeof window !== 'undefined' && window.innerWidth < 768) {
+              sidebarOpen = false;
+            }
+          }}
           class="flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-medium transition-all group relative {active
             ? 'bg-[#0d1c42] text-[#fcf1d0] font-semibold border border-[#22396f] shadow-inner shadow-[#010736]/50'
             : 'text-[#8fa2cb] hover:text-[#fcf1d0] hover:bg-[#0d1c42]/60'}"
@@ -206,20 +224,29 @@
   <!-- Main Viewport (Top Bar + Dynamic Content) -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#010736]">
     <!-- Top Bar -->
-    <header class="h-14 border-b border-[#22396f]/50 bg-[#071330]/90 backdrop-blur px-6 flex items-center justify-between shrink-0 z-20">
-      <!-- Breadcrumb -->
-      <div class="flex items-center gap-2 text-xs font-mono">
-        <span class="text-[#8fa2cb]/70">Agency HQ</span>
-        <span class="text-[#22396f]">/</span>
-        <span class="text-[#fcf1d0] font-semibold">
+    <header class="h-14 border-b border-[#22396f]/50 bg-[#071330]/90 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 z-20">
+      <!-- Breadcrumb & Mobile Menu Toggle -->
+      <div class="flex items-center gap-2 text-xs font-mono min-w-0">
+        <button
+          onclick={() => (sidebarOpen = !sidebarOpen)}
+          class="md:hidden p-1.5 rounded-lg bg-[#0d1c42] border border-[#22396f] text-[#fcf1d0] shrink-0 hover:bg-[#22396f]/50 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <span class="text-[#8fa2cb]/70 hidden sm:inline">Agency HQ</span>
+        <span class="text-[#22396f] hidden sm:inline">/</span>
+        <span class="text-[#fcf1d0] font-semibold truncate max-w-[140px] sm:max-w-none">
           {#if page.url.pathname === '/'}
             Analytics & Live Logs
           {:else if page.url.pathname.startsWith('/tasks')}
-            Channel Tasks & Upload Scheduler
+            Tasks & Slots
           {:else if page.url.pathname.startsWith('/hq')}
-            3D Virtual Headquarters
+            Virtual HQ 3D
           {:else if page.url.pathname.startsWith('/agents')}
-            Agent Brain & Dossier
+            Agent Dossier
           {:else}
             Console
           {/if}
@@ -227,7 +254,7 @@
       </div>
 
       <!-- Quick Actions & Clocks -->
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <!-- Realtime Badge -->
         <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-emerald-500/30 bg-emerald-500/10 text-emerald-300">
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
@@ -236,7 +263,7 @@
 
         <!-- Clock -->
         {#if currentTime}
-          <div class="text-[11px] font-mono text-[#8fa2cb] bg-[#0d1c42] px-2.5 py-1 rounded-md border border-[#22396f]/40 hidden md:block">
+          <div class="text-[11px] font-mono text-[#8fa2cb] bg-[#0d1c42] px-2.5 py-1 rounded-md border border-[#22396f]/40 hidden lg:block">
             🕒 {currentTime}
           </div>
         {/if}
@@ -244,13 +271,11 @@
         <!-- Date Link Selector -->
         <a
           href="?date={data.today}"
-          class="text-[11px] font-mono px-2.5 py-1 rounded-md border border-[#22396f] bg-[#0d1c42] hover:bg-[#22396f]/40 text-[#fcf1d0] transition-colors flex items-center gap-1"
+          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#22396f] bg-[#0d1c42] hover:bg-[#22396f]/40 text-[#fcf1d0] transition-colors flex items-center gap-1"
         >
           <span>📅</span>
-          <span>{data.selectedDate}</span>
-          {#if data.selectedDate === data.today}
-            <span class="text-[9px] text-[#00e5ff] font-bold">(Today)</span>
-          {/if}
+          <span class="hidden sm:inline">{data.today}</span>
+          <span class="text-[9px] text-[#00e5ff] font-bold">(Today)</span>
         </a>
       </div>
     </header>
