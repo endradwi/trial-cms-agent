@@ -68,8 +68,8 @@ ON CONFLICT (slug) DO UPDATE SET
 -- ============================================================
 
 INSERT INTO public.agent_skills (agent_id, name, description, category)
-SELECT a.id, s.name, s.description, s.category FROM public.agents a
-CROSS JOIN (VALUES
+SELECT a.id, s.name, s.description, s.category
+FROM (VALUES
   ('coco', 'morning-briefing', 'Ekstraksi metrik & rekap performa 13 channel setiap jam 08:30 WIB', 'ops'),
   ('coco', 'bounty-dispatch', 'Delegasi task bounty ke Dimas & tim clipper', 'workflow'),
   ('coco', 'channel-scheduler', 'Mengawal slot upload harian agar zero miss', 'scheduling'),
@@ -88,15 +88,16 @@ CROSS JOIN (VALUES
   ('budi', 'heatmap-analysis', 'Identifikasi segmen paling banyak ditonton ulang (most replayed)', 'analytics'),
   ('raka', 'terminal-automation', 'Automasi cronjob dan background queue processing', 'automation'),
   ('raka', 'telegram-gateway', 'Routing pesan multi-agent via Telegram bot gateway', 'bot')
-) AS s(agent_slug, name, description, category) ON a.slug = s.agent_slug;
+) AS s(agent_slug, name, description, category)
+JOIN public.agents a ON a.slug = s.agent_slug;
 
 -- ============================================================
 -- SEED: Agent Memories
 -- ============================================================
 
 INSERT INTO public.agent_memories (agent_id, category, content)
-SELECT a.id, m.category, m.content FROM public.agents a
-CROSS JOIN (VALUES
+SELECT a.id, m.category, m.content
+FROM (VALUES
   ('coco', 'convention', 'Owner wajib disapa "dude" di semua bot/agent.'),
   ('coco', 'target', 'Target finansial: $1.500 sebelum 31 Desember 2026.'),
   ('coco', 'ops', 'Morning Executive Briefing dikirim maksimal jam 09:00 WIB.'),
@@ -112,7 +113,8 @@ CROSS JOIN (VALUES
   ('layla', 'affiliate', 'Amazon Associates (optionmarket-20) wajib TANPA VPN untuk cegah anti-fraud ban.'),
   ('budi', 'retention', 'Prioritaskan klip dengan lonjakan retensi >80% pada 5 detik pertama.'),
   ('raka', 'telegram', 'Telegram bot di group tidak bisa melihat sesama bot; inter-agent dispatch wajib server-side.')
-) AS m(agent_slug, category, content) ON a.slug = m.agent_slug;
+) AS m(agent_slug, category, content)
+JOIN public.agents a ON a.slug = m.agent_slug;
 
 -- ============================================================
 -- REALTIME: Enable realtime on agents table for live status sync
