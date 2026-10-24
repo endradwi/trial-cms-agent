@@ -62,26 +62,26 @@
 <Dialog.Root bind:open>
   <Dialog.Portal>
     <Dialog.Overlay class="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs transition-all" />
-    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-[#ffffff] p-5 border border-[#d9cfc7] shadow-2xl font-mono text-[#2d2b28] max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between pb-3 border-b border-[#d9cfc7]">
+    <Dialog.Content class="fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] rounded-2xl bg-[#ffffff] p-6 border border-[#d9cfc7] shadow-2xl font-mono text-[#2d2b28] max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3.5 border-b border-[#d9cfc7]">
         <div>
-          <Dialog.Title class="text-sm font-bold flex items-center gap-2">
+          <Dialog.Title class="text-base font-bold flex items-center gap-2">
             <span>{channel.name}</span>
-            <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#efe9e3] border border-[#d9cfc7] text-[#7a756f]">{channel.handle || channel.slug}</span>
+            <span class="text-xs px-2 py-0.5 rounded bg-[#efe9e3] border border-[#d9cfc7] text-[#7a756f]">{channel.handle || channel.slug}</span>
           </Dialog.Title>
-          <Dialog.Description class="text-xs text-[#7a756f] mt-0.5">
+          <Dialog.Description class="text-xs sm:text-sm text-[#7a756f] mt-1">
             Slot {slotInfo.label} ({slotInfo.time}) • {date}
           </Dialog.Description>
         </div>
-        <Dialog.Close class="p-1 rounded-lg text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3]">
-          <X size={16} />
+        <Dialog.Close class="p-1.5 rounded-lg text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3]">
+          <X size={18} />
         </Dialog.Close>
       </div>
 
       <form
         method="POST"
         action={`?date=${date}&/updateSlot`}
-        class="mt-4 flex flex-col gap-3"
+        class="mt-5 flex flex-col gap-3.5"
         use:enhance={() => {
           saving = true;
           errorMsg = '';
@@ -105,16 +105,16 @@
         <input type="hidden" name="status" value={status} />
 
         <!-- Status Selector Grid -->
-        <div class="flex flex-col gap-1.5">
-          <span class="text-[11px] font-bold text-[#7a756f] uppercase">Status Konten</span>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+        <div class="flex flex-col gap-2">
+          <span class="text-xs font-bold text-[#7a756f] uppercase tracking-wider">Status Konten</span>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {#each statuses as item}
               <button
                 type="button"
                 onclick={() => status = item.id}
-                class="py-1.5 px-2 rounded-lg text-[10px] font-bold border transition text-left flex items-center gap-1.5 {status === item.id ? 'bg-[#2d2b28] border-[#2d2b28] text-white shadow-sm' : `bg-[#f9f8f6] ${item.class}`}"
+                class="py-2 px-2.5 rounded-xl text-xs font-bold border transition text-left flex items-center gap-2 {status === item.id ? 'bg-[#2d2b28] border-[#2d2b28] text-white shadow-sm' : `bg-[#f9f8f6] ${item.class}`}"
               >
-                <span class="w-2 h-2 rounded-full {item.dotClass} shrink-0"></span>
+                <span class="w-2.5 h-2.5 rounded-full {item.dotClass} shrink-0"></span>
                 <span class="truncate">{item.label}</span>
               </button>
             {/each}
@@ -122,25 +122,25 @@
         </div>
 
         <!-- Video Title -->
-        <div class="flex flex-col gap-1">
-          <label for="video_title" class="text-[11px] font-bold text-[#7a756f]">Judul Video / Topik</label>
+        <div class="flex flex-col gap-1.5">
+          <label for="video_title" class="text-xs font-bold text-[#7a756f]">Judul Video / Topik</label>
           <input
             id="video_title"
             name="video_title"
             bind:value={videoTitle}
             placeholder="Contoh: Ahmed Klip 14 - Corporate Dating"
-            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-2 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
           />
         </div>
 
         <!-- Public Video URL -->
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-1.5">
           <div class="flex items-center justify-between">
-            <label for="video_url" class="text-[11px] font-bold text-[#7a756f]">Link Video Medsos (Shorts / TikTok / Pin)</label>
+            <label for="video_url" class="text-xs font-bold text-[#7a756f]">Link Video Medsos (Shorts / TikTok / Pin)</label>
             {#if videoUrl}
-              <a href={videoUrl} target="_blank" rel="noreferrer" class="text-[10px] text-[#8f7556] hover:underline flex items-center gap-1 font-bold">
+              <a href={videoUrl} target="_blank" rel="noreferrer" class="text-xs text-[#8f7556] hover:underline flex items-center gap-1 font-bold">
                 <span>Buka</span>
-                <ExternalLink size={10} />
+                <ExternalLink size={12} />
               </a>
             {/if}
           </div>
@@ -150,21 +150,21 @@
             type="url"
             bind:value={videoUrl}
             placeholder="https://youtube.com/shorts/... atau https://tiktok.com/..."
-            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-2 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
           />
         </div>
 
         <!-- Bounty Submission URL (If Bounty Channel) -->
         {#if channel.bounty_platform && channel.bounty_platform !== 'Internal'}
-          <div class="flex flex-col gap-1 p-2.5 bg-[#f9f8f6] rounded-xl border border-[#d9cfc7]">
+          <div class="flex flex-col gap-1.5 p-3 bg-[#f9f8f6] rounded-xl border border-[#d9cfc7]">
             <div class="flex items-center justify-between">
-              <label for="bounty_url" class="text-[11px] font-bold text-[#2d2b28]">
+              <label for="bounty_url" class="text-xs font-bold text-[#2d2b28]">
                 Link Bukti Submission Bounty ({channel.bounty_platform})
               </label>
               {#if bountyUrl}
-                <a href={bountyUrl} target="_blank" rel="noreferrer" class="text-[10px] text-emerald-700 hover:underline flex items-center gap-1 font-bold">
+                <a href={bountyUrl} target="_blank" rel="noreferrer" class="text-xs text-emerald-700 hover:underline flex items-center gap-1 font-bold">
                   <span>Cek Bounty</span>
-                  <ExternalLink size={10} />
+                  <ExternalLink size={12} />
                 </a>
               {/if}
             </div>
@@ -174,72 +174,72 @@
               type="url"
               bind:value={bountyUrl}
               placeholder="https://whop.com/checkout/... atau bukti form submit"
-              class="w-full bg-[#ffffff] border border-[#d9cfc7] rounded-lg px-2.5 py-1.5 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+              class="w-full bg-[#ffffff] border border-[#d9cfc7] rounded-lg px-3 py-2 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
             />
-            <span class="text-[9px] text-[#7a756f]">Wajib disubmit langsung setelah upload agar link tidak kadaluarsa!</span>
+            <span class="text-xs text-[#7a756f]">Wajib disubmit langsung setelah upload agar link tidak kadaluarsa!</span>
           </div>
         {/if}
 
         <!-- Raw Drive URL & PIC -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div class="flex flex-col gap-1">
-            <label for="drive_url" class="text-[11px] font-bold text-[#7a756f]">Link Google Drive (Opsional)</label>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="flex flex-col gap-1.5">
+            <label for="drive_url" class="text-xs font-bold text-[#7a756f]">Link Google Drive (Opsional)</label>
             <input
               id="drive_url"
               name="drive_url"
               type="url"
               bind:value={driveUrl}
               placeholder="https://drive.google.com/..."
-              class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-1.5 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+              class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-2 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
             />
           </div>
 
-          <div class="flex flex-col gap-1">
-            <label for="pic_name" class="text-[11px] font-bold text-[#7a756f]">PIC Operator / Tim</label>
+          <div class="flex flex-col gap-1.5">
+            <label for="pic_name" class="text-xs font-bold text-[#7a756f]">PIC Operator / Tim</label>
             <input
               id="pic_name"
               name="pic_name"
               bind:value={picName}
               placeholder="Nama Editor"
-              class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-1.5 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+              class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-2 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
             />
           </div>
         </div>
 
         <!-- Notes -->
-        <div class="flex flex-col gap-1">
-          <label for="notes" class="text-[11px] font-bold text-[#7a756f]">Catatan Evaluasi (Opsional)</label>
+        <div class="flex flex-col gap-1.5">
+          <label for="notes" class="text-xs font-bold text-[#7a756f]">Catatan Evaluasi (Opsional)</label>
           <input
             id="notes"
             name="notes"
             bind:value={notes}
             placeholder="Catatan kendala, sound trending yang dipakai, dll"
-            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-1.5 text-xs text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
+            class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3 py-2 text-xs sm:text-sm text-[#2d2b28] placeholder:text-[#7a756f]/50 focus:outline-none focus:border-[#8f7556]"
           />
         </div>
 
         {#if errorMsg}
-          <p role="alert" class="text-[11px] text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{errorMsg}</p>
+          <p role="alert" class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 font-bold">{errorMsg}</p>
         {/if}
 
         <!-- Actions -->
-        <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#d9cfc7] mt-1">
+        <div class="flex items-center justify-end gap-3 pt-3.5 border-t border-[#d9cfc7] mt-1">
           <button
             type="button"
             onclick={() => open = false}
-            class="px-4 py-2 rounded-xl text-xs font-bold text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3] transition"
+            class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#efe9e3] transition"
           >
             Batal
           </button>
           <button
             type="submit"
             disabled={saving}
-            class="px-5 py-2 rounded-xl text-xs font-bold bg-[#2d2b28] hover:bg-[#1c1917] text-white transition shadow-sm flex items-center gap-1.5 active:scale-95 disabled:opacity-60"
+            class="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-[#2d2b28] hover:bg-[#1c1917] text-white transition shadow-sm flex items-center gap-2 active:scale-95 disabled:opacity-60"
           >
             {#if saving}
-              <Loader2 size={14} class="animate-spin" />
+              <Loader2 size={16} class="animate-spin" />
             {:else}
-              <CheckCircle2 size={14} />
+              <CheckCircle2 size={16} />
             {/if}
             <span>{saving ? 'Menyimpan...' : 'Simpan'}</span>
           </button>

@@ -27,7 +27,7 @@
 
   const sizes = {
     default: 'h-9 px-4 py-2 text-xs',
-    sm: 'h-7 px-2.5 text-[11px]',
+    sm: 'h-7 px-2.5 text-xs',
     lg: 'h-10 px-5 text-sm',
     icon: 'h-8 w-8 p-0 flex items-center justify-center'
   };

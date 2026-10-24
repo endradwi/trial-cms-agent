@@ -61,34 +61,38 @@
   });
 </script>
 
-<div class="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
+<svelte:head>
+  <title>Channel Tasks & SOP Upload — Option Agency</title>
+</svelte:head>
+
+<div class="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-7">
   <!-- Top Header with Summary Bar (Bright Palette) -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#ffffff] border border-[#d9cfc7] p-5 sm:p-6 rounded-2xl shadow-xs">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-5 bg-[#ffffff] border border-[#d9cfc7] p-6 sm:p-7 rounded-2xl shadow-xs">
     <div>
-      <h1 class="text-xl font-bold tracking-tight text-[#2d2b28] flex items-center gap-2">
-        <ListTodo size={20} class="text-[#8f7556]" />
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-[#2d2b28] flex items-center gap-2.5">
+        <ListTodo size={24} class="text-[#8f7556]" />
         <span>Channel Tasks & SOP Upload Schedule</span>
       </h1>
-      <p class="text-xs text-[#7a756f] mt-1 font-mono">
+      <p class="text-sm text-[#7a756f] mt-1.5 font-mono">
         Tracking target kuota 13 channel medsos (Clipper US, Indo & Affiliate) — {data.selectedDate}
       </p>
     </div>
 
     <!-- Live Progress Counters -->
-    <div class="flex items-center gap-6">
+    <div class="flex items-center gap-6 shrink-0">
       <div class="text-right">
-        <div class="text-[11px] font-mono text-[#7a756f] uppercase tracking-wider font-semibold">Video Live</div>
-        <div class="text-lg font-bold font-mono text-[#059669]">
+        <div class="text-xs font-mono text-[#7a756f] uppercase tracking-wider font-bold">Video Live</div>
+        <div class="text-2xl sm:text-3xl font-bold font-mono text-[#059669]">
           {progress.completedSlots} / {progress.totalSlots}
-          <span class="text-xs text-[#7a756f] font-normal">({progress.percentage}%)</span>
+          <span class="text-sm text-[#7a756f] font-normal">({progress.percentage}%)</span>
         </div>
       </div>
 
-      <div class="h-8 w-px bg-[#d9cfc7]"></div>
+      <div class="h-10 w-px bg-[#d9cfc7]"></div>
 
       <div class="text-right">
-        <div class="text-[11px] font-mono text-[#7a756f] uppercase tracking-wider font-semibold">Bounty Submitted</div>
-        <div class="text-lg font-bold font-mono text-[#8f7556]">
+        <div class="text-xs font-mono text-[#7a756f] uppercase tracking-wider font-bold">Bounty Submitted</div>
+        <div class="text-2xl sm:text-3xl font-bold font-mono text-[#8f7556]">
           {progress.bountySubmitted}
         </div>
       </div>
@@ -96,12 +100,12 @@
   </div>
 
   <!-- Filters & Search Toolbar -->
-  <div class="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#ffffff] p-3 rounded-xl border border-[#d9cfc7] shadow-2xs">
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-3.5 bg-[#ffffff] p-4 rounded-2xl border border-[#d9cfc7] shadow-2xs">
     <!-- Category Tabs -->
-    <div class="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+    <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
       <button
         onclick={() => (filterCategory = 'ALL')}
-        class="px-3 py-1.5 rounded-lg text-xs font-mono transition-colors {filterCategory === 'ALL'
+        class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-mono transition-colors {filterCategory === 'ALL'
           ? 'bg-[#2d2b28] text-white font-bold shadow-xs'
           : 'text-[#7a756f] hover:bg-[#efe9e3]'}"
       >
@@ -109,23 +113,23 @@
       </button>
       <button
         onclick={() => (filterCategory = 'clipper_us')}
-        class="px-3 py-1.5 rounded-lg text-xs font-mono transition-colors {filterCategory === 'clipper_us'
+        class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-mono transition-colors {filterCategory === 'clipper_us'
           ? 'bg-[#2d2b28] text-white font-bold shadow-xs'
           : 'text-[#7a756f] hover:bg-[#efe9e3]'}"
       >
-        🇺🇸 Clipper US (10)
+        Clipper US (10)
       </button>
       <button
         onclick={() => (filterCategory = 'clipper_indo')}
-        class="px-3 py-1.5 rounded-lg text-xs font-mono transition-colors {filterCategory === 'clipper_indo'
+        class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-mono transition-colors {filterCategory === 'clipper_indo'
           ? 'bg-[#2d2b28] text-white font-bold shadow-xs'
           : 'text-[#7a756f] hover:bg-[#efe9e3]'}"
       >
-        🇮🇩 Clipper Indo (2)
+        Clipper Indo (2)
       </button>
       <button
         onclick={() => (filterCategory = 'affiliate')}
-        class="px-3 py-1.5 rounded-lg text-xs font-mono transition-colors {filterCategory === 'affiliate'
+        class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-mono transition-colors {filterCategory === 'affiliate'
           ? 'bg-[#2d2b28] text-white font-bold shadow-xs'
           : 'text-[#7a756f] hover:bg-[#efe9e3]'}"
       >
@@ -134,12 +138,12 @@
     </div>
 
     <!-- Search Input -->
-    <div class="w-full sm:w-64">
+    <div class="w-full sm:w-72">
       <input
         type="text"
         bind:value={searchQuery}
         placeholder="Cari channel / handle..."
-        class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-lg px-3 py-1.5 text-xs text-[#2d2b28] placeholder-[#7a756f]/60 focus:outline-none focus:border-[#8f7556]"
+        class="w-full bg-[#f9f8f6] border border-[#d9cfc7] rounded-xl px-3.5 py-2 text-xs sm:text-sm text-[#2d2b28] placeholder-[#7a756f]/60 focus:outline-none focus:border-[#8f7556]"
       />
     </div>
   </div>

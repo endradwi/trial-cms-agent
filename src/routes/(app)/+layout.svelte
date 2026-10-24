@@ -113,23 +113,23 @@
   <!-- Supabase-style Sidebar (ColorHunt Warm Light Palette) -->
   <aside
     class="fixed inset-y-0 left-0 md:static flex flex-col border-r border-[#d9cfc7] bg-[#efe9e3] transition-all duration-200 z-30 shrink-0 {sidebarOpen
-      ? 'w-64 translate-x-0'
+      ? 'w-72 translate-x-0'
       : '-translate-x-full md:translate-x-0 md:w-16'}"
   >
     <!-- Brand / Project Header -->
-    <div class="h-14 border-b border-[#d9cfc7] flex items-center justify-between px-3.5 bg-[#efe9e3]">
-      <div class="flex items-center gap-2.5 overflow-hidden">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#c9b59c] to-[#8f7556] flex items-center justify-center font-bold text-xs text-white shadow-sm shrink-0">
-          <Zap size={16} />
+    <div class="h-16 border-b border-[#d9cfc7] flex items-center justify-between px-4 bg-[#efe9e3]">
+      <div class="flex items-center gap-3 overflow-hidden">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#c9b59c] to-[#8f7556] flex items-center justify-center font-bold text-white shadow-sm shrink-0">
+          <Zap size={18} />
         </div>
         {#if sidebarOpen}
           <div class="flex flex-col min-w-0">
-            <span class="font-bold text-sm tracking-tight text-[#2d2b28] truncate flex items-center gap-1.5">
+            <span class="font-bold text-base tracking-tight text-[#2d2b28] truncate flex items-center gap-2">
               Agency HQ
-              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[#ffffff] text-[#8f7556] border border-[#d9cfc7] font-semibold">PROD</span>
+              <span class="text-xs font-mono px-2 py-0.5 rounded bg-[#ffffff] text-[#8f7556] border border-[#d9cfc7] font-bold">PROD</span>
             </span>
-            <span class="text-[11px] font-mono text-[#7a756f] truncate flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-mono text-[#7a756f] truncate flex items-center gap-1.5 mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
               option-agency/main
             </span>
           </div>
@@ -137,7 +137,7 @@
       </div>
       <button
         onclick={() => (sidebarOpen = !sidebarOpen)}
-        class="text-[#7a756f] hover:text-[#2d2b28] p-1.5 rounded-md hover:bg-[#d9cfc7]/40 transition-colors shrink-0"
+        class="text-[#7a756f] hover:text-[#2d2b28] p-2 rounded-lg hover:bg-[#d9cfc7]/40 transition-colors shrink-0"
         title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
         aria-label="Toggle sidebar"
       >
@@ -148,9 +148,9 @@
     </div>
 
     <!-- Navigation List -->
-    <nav class="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
+    <nav class="flex-1 py-4 px-2.5 space-y-1.5 overflow-y-auto">
       {#if sidebarOpen}
-        <div class="px-2.5 pb-2 text-[10px] font-mono uppercase tracking-wider text-[#7a756f] font-bold">
+        <div class="px-3 pb-2 text-xs font-mono uppercase tracking-wider text-[#7a756f] font-bold">
           Operations Modules
         </div>
       {/if}
@@ -165,18 +165,18 @@
               sidebarOpen = false;
             }
           }}
-          class="flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-medium transition-all group relative {active
+          class="flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all group relative {active
             ? 'bg-[#ffffff] text-[#2d2b28] font-bold border border-[#d9cfc7] shadow-sm'
             : 'text-[#7a756f] hover:text-[#2d2b28] hover:bg-[#f9f8f6]'}"
           title={!sidebarOpen ? item.label : undefined}
         >
-          <Icon size={17} class="shrink-0 transition-transform group-hover:scale-110 {active ? 'text-[#8f7556]' : 'text-[#7a756f]'}" />
+          <Icon size={19} class="shrink-0 transition-transform group-hover:scale-110 {active ? 'text-[#8f7556]' : 'text-[#7a756f]'}" />
           {#if sidebarOpen}
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="truncate">{item.label}</span>
                 {#if item.badge}
-                  <span class="text-[9px] font-mono px-1.5 py-0.2 rounded border {active ? 'bg-[#c9b59c]/30 text-[#8f7556] border-[#c9b59c] font-bold' : 'bg-[#ffffff] text-[#7a756f] border-[#d9cfc7]'}">
+                  <span class="text-xs font-mono px-2 py-0.5 rounded border {active ? 'bg-[#c9b59c]/30 text-[#8f7556] border-[#c9b59c] font-bold' : 'bg-[#ffffff] text-[#7a756f] border-[#d9cfc7]'}">
                     {item.badge}
                   </span>
                 {/if}
@@ -184,64 +184,64 @@
             </div>
           {/if}
           {#if active}
-            <div class="absolute left-0 top-1.5 bottom-1.5 w-1 bg-[#c9b59c] rounded-r"></div>
+            <div class="absolute left-0 top-2 bottom-2 w-1.5 bg-[#c9b59c] rounded-r"></div>
           {/if}
         </a>
       {/each}
     </nav>
 
     <!-- Bottom Sidebar Status & User Info -->
-    <div class="p-3 border-t border-[#d9cfc7] space-y-2 bg-[#efe9e3]">
+    <div class="p-3 border-t border-[#d9cfc7] space-y-2.5 bg-[#efe9e3]">
       {#if sidebarOpen}
         <!-- Telemetry Indicators -->
-        <div class="space-y-1.5 text-[11px] font-mono text-[#7a756f] bg-[#ffffff] p-2.5 rounded-lg border border-[#d9cfc7] shadow-xs">
+        <div class="space-y-2 text-xs font-mono text-[#7a756f] bg-[#ffffff] p-3 rounded-xl border border-[#d9cfc7] shadow-xs">
           <div class="flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}"></span>
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}"></span>
               Supabase DB
             </span>
-            <span class="text-emerald-600 font-bold text-[10px]">Connected</span>
+            <span class="text-emerald-700 font-bold text-xs">Connected</span>
           </div>
           <div class="flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-600"></span>
+            <span class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-cyan-600"></span>
               Telegram Bot
             </span>
-            <span class="text-[#2d2b28] font-medium text-[10px]">@coco_vendor</span>
+            <span class="text-[#2d2b28] font-semibold text-xs">@coco_vendor</span>
           </div>
-          <div class="flex items-center justify-between text-[10px] text-[#7a756f] pt-0.5 border-t border-[#d9cfc7]/60">
+          <div class="flex items-center justify-between text-xs text-[#7a756f] pt-1.5 border-t border-[#d9cfc7]/60">
             <span>VPS Host</span>
-            <span class="font-mono">43.134.28.4:3001</span>
+            <span class="font-mono font-medium">43.134.28.4:3001</span>
           </div>
         </div>
 
         <!-- User Profile Pill -->
-        <div class="flex items-center justify-between px-2 py-1.5 bg-[#ffffff] rounded-lg border border-[#d9cfc7] shadow-xs">
+        <div class="flex items-center justify-between px-3 py-2 bg-[#ffffff] rounded-xl border border-[#d9cfc7] shadow-xs">
           <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-              <Crown size={14} />
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+              <Crown size={15} />
             </div>
             <div class="flex flex-col min-w-0">
-              <span class="text-xs font-bold text-[#2d2b28] truncate leading-tight">dude</span>
-              <span class="text-[10px] font-mono text-[#7a756f] truncate">Owner & Tech Lead</span>
+              <span class="text-sm font-bold text-[#2d2b28] truncate leading-tight">dude</span>
+              <span class="text-xs font-mono text-[#7a756f] truncate">Owner & Tech Lead</span>
             </div>
           </div>
           <form method="POST" action="/login?/logout">
             <button
               type="submit"
-              class="p-1 rounded text-[#7a756f] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              class="p-1.5 rounded-lg text-[#7a756f] hover:text-rose-600 hover:bg-rose-50 transition-colors"
               title="Logout"
               aria-label="Logout"
             >
-              <LogOut size={13} />
+              <LogOut size={15} />
             </button>
           </form>
         </div>
       {:else}
-        <div class="flex flex-col items-center gap-2">
-          <div class="w-2 h-2 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}" title="Supabase DB Connected"></div>
-          <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
-            <Crown size={14} />
+        <div class="flex flex-col items-center gap-2.5 py-1">
+          <div class="w-2.5 h-2.5 rounded-full {isRealtimeActive ? 'bg-emerald-500 animate-pulse' : 'bg-emerald-600'}" title="Supabase DB Connected"></div>
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-[#c9b59c] to-[#8f7556] text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+            <Crown size={15} />
           </div>
         </div>
       {/if}
@@ -251,19 +251,19 @@
   <!-- Main Viewport (Top Bar + Dynamic Content) -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#f9f8f6]">
     <!-- Top Bar -->
-    <header class="h-14 border-b border-[#d9cfc7] bg-[#ffffff]/90 backdrop-blur px-3 sm:px-6 flex items-center justify-between shrink-0 z-20">
+    <header class="h-16 border-b border-[#d9cfc7] bg-[#ffffff]/90 backdrop-blur px-4 sm:px-6 flex items-center justify-between shrink-0 z-20">
       <!-- Breadcrumb & Mobile Menu Toggle -->
-      <div class="flex items-center gap-2 text-xs font-mono min-w-0">
+      <div class="flex items-center gap-2.5 text-sm font-mono min-w-0">
         <button
           onclick={() => (sidebarOpen = !sidebarOpen)}
-          class="md:hidden p-1.5 rounded-lg bg-[#efe9e3] border border-[#d9cfc7] text-[#2d2b28] shrink-0 hover:bg-[#d9cfc7]/50 transition-colors"
+          class="md:hidden p-2 rounded-lg bg-[#efe9e3] border border-[#d9cfc7] text-[#2d2b28] shrink-0 hover:bg-[#d9cfc7]/50 transition-colors"
           aria-label="Toggle menu"
         >
-          <Menu size={16} />
+          <Menu size={18} />
         </button>
-        <span class="text-[#7a756f] hidden sm:inline font-medium">Agency HQ</span>
+        <span class="text-[#7a756f] hidden sm:inline font-semibold">Agency HQ</span>
         <span class="text-[#d9cfc7] hidden sm:inline">/</span>
-        <span class="text-[#2d2b28] font-bold truncate max-w-[140px] sm:max-w-none">
+        <span class="text-[#2d2b28] font-bold text-sm sm:text-base truncate max-w-[140px] sm:max-w-none">
           {#if page.url.pathname === '/'}
             Analytics & Live Logs
           {:else if page.url.pathname.startsWith('/tasks')}
@@ -285,15 +285,15 @@
       <!-- Quick Actions & Clocks -->
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
         <!-- Realtime Badge -->
-        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono border border-emerald-500/40 bg-emerald-50 text-emerald-800">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
-          <span class="font-semibold">Realtime Live</span>
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono border border-emerald-500/40 bg-emerald-50 text-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+          <span class="font-bold">Realtime Live</span>
         </div>
 
         <!-- Clock -->
         {#if currentTime}
-          <div class="text-[11px] font-mono text-[#2d2b28] bg-[#efe9e3] px-2.5 py-1 rounded-md border border-[#d9cfc7] hidden lg:flex items-center gap-1 font-medium">
-            <Clock size={12} class="text-[#8f7556]" />
+          <div class="text-xs font-mono text-[#2d2b28] bg-[#efe9e3] px-3 py-1.5 rounded-lg border border-[#d9cfc7] hidden lg:flex items-center gap-1.5 font-semibold">
+            <Clock size={14} class="text-[#8f7556]" />
             <span>{currentTime}</span>
           </div>
         {/if}
@@ -301,11 +301,11 @@
         <!-- Date Link Selector -->
         <a
           href="?date={data.today}"
-          class="text-[11px] font-mono px-2 sm:px-2.5 py-1 rounded-md border border-[#d9cfc7] bg-[#ffffff] hover:bg-[#efe9e3] text-[#2d2b28] transition-colors flex items-center gap-1.5 shadow-xs"
+          class="text-xs font-mono px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#d9cfc7] bg-[#ffffff] hover:bg-[#efe9e3] text-[#2d2b28] transition-colors flex items-center gap-1.5 shadow-xs font-semibold"
         >
-          <Calendar size={12} class="text-[#8f7556]" />
-          <span class="hidden sm:inline font-medium">{data.today}</span>
-          <span class="text-[9px] text-[#8f7556] font-bold">(Today)</span>
+          <Calendar size={14} class="text-[#8f7556]" />
+          <span class="hidden sm:inline">{data.today}</span>
+          <span class="text-xs text-[#8f7556] font-bold">(Today)</span>
         </a>
       </div>
     </header>

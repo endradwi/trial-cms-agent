@@ -649,7 +649,7 @@
 </script>
 
 <div bind:this={container} class="w-full h-[430px] rounded-2xl border border-[#22396f]/60 overflow-hidden relative">
-  <div class="absolute top-3 left-3 z-10 text-[10px] font-mono text-[#8fa2cb]/70 pointer-events-none select-none bg-[#010736]/70 px-2 py-1 rounded-md border border-[#22396f]/40">
+  <div class="absolute top-3 left-3 z-10 text-xs font-mono text-[#8fa2cb]/80 pointer-events-none select-none bg-[#010736]/70 px-2.5 py-1.5 rounded-lg border border-[#22396f]/40">
     Virtual HQ — Klik meja / karakter agent untuk inspect
   </div>
 </div>
