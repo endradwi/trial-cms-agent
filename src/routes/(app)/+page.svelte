@@ -265,17 +265,17 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- DIAGRAM 1: 24-Hour Telemetry Area Chart -->
       <div class="lg:col-span-2 bg-[#ffffff] border border-[#d9cfc7] rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#d9cfc7]/60 pb-3.5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#d9cfc7]/60 pb-3">
           <div>
-            <h2 class="text-lg sm:text-xl font-bold text-[#2d2b28] flex items-center gap-2.5">
-              <TrendingUp size={20} class="text-[#8f7556]" />
-              <span>24-Hour Operations & View Telemetry Curve</span>
+            <h2 class="text-base sm:text-lg font-bold text-[#2d2b28] flex items-center gap-2">
+              <TrendingUp size={18} class="text-[#8f7556]" />
+              <span>24H Operations & Telemetry</span>
             </h2>
-            <p class="text-xs sm:text-sm text-[#7a756f] font-mono mt-1">
-              Distribusi volume aktivitas posting & engagement audiens sepanjang hari (WIB)
+            <p class="text-xs text-[#7a756f] font-mono mt-0.5">
+              Distribusi posting & engagement harian (WIB)
             </p>
           </div>
-          <div class="flex items-center gap-2 text-xs sm:text-sm font-mono text-[#7a756f] bg-[#efe9e3] px-3 py-1.5 rounded-lg border border-[#d9cfc7] whitespace-nowrap shrink-0">
+          <div class="flex items-center gap-1.5 text-xs font-mono text-[#7a756f] bg-[#efe9e3] px-2.5 py-1 rounded-lg border border-[#d9cfc7] whitespace-nowrap shrink-0">
             <span>Peak:</span>
             <span class="font-bold text-[#8f7556]">{hourlyTelemetry.peakPoint.h}:00 WIB ({hourlyTelemetry.peakPoint.val} index)</span>
           </div>
