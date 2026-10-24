@@ -5,6 +5,7 @@ export interface ChannelVideoStat {
   id: string;
   title: string;
   views: string;
+  viewsCount?: number;
 }
 
 export interface ChannelViewSummary {
@@ -34,7 +35,7 @@ function cleanTitle(str: string): string {
     .trim();
 }
 
-function parseViewsString(str: string): number {
+export function parseViewsString(str: string): number {
   if (!str) return 0;
   const clean = str.toLowerCase().replace('views', '').replace('view', '').trim();
   if (clean.includes('k')) {
@@ -81,7 +82,8 @@ export async function fetchLiveViewsFromYouTube(): Promise<Record<string, Channe
             const title = cleanTitle(vm?.overlayMetadata?.primaryText?.content || '');
             const views = vm?.overlayMetadata?.secondaryText?.content || '';
             if (vidId) {
-              vids.push({ id: vidId, title, views });
+              const viewsCount = parseViewsString(views);
+              vids.push({ id: vidId, title, views, viewsCount });
             }
           }
         }

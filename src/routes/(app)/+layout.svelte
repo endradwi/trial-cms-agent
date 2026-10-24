@@ -2,7 +2,7 @@
   import { page } from '$app/state';
   import { onMount } from 'svelte';
   import { createClient } from '@supabase/supabase-js';
-  import { BarChart3, ListTodo, Box, Brain, Zap, Clock, Calendar, Crown, Menu, LogOut } from 'lucide-svelte';
+  import { BarChart3, ListTodo, Film, BookOpen, Box, Brain, Zap, Clock, Calendar, Crown, Menu, LogOut } from 'lucide-svelte';
 
   let { data, children } = $props();
 
@@ -58,6 +58,20 @@
       icon: ListTodo,
       badge: '13 Ch',
       desc: 'SOP upload slot scheduler & verification'
+    },
+    {
+      href: '/videos',
+      label: 'Video Vault',
+      icon: Film,
+      badge: 'Library',
+      desc: 'Koleksi video, views, dan arsip konten'
+    },
+    {
+      href: '/playbook',
+      label: 'Agency Playbook',
+      icon: BookOpen,
+      badge: 'SOP',
+      desc: 'Jadwal upload, aturan editing, dan pedoman VPN'
     },
     {
       href: '/hq',
@@ -254,6 +268,10 @@
             Analytics & Live Logs
           {:else if page.url.pathname.startsWith('/tasks')}
             Tasks & Slots
+          {:else if page.url.pathname.startsWith('/videos')}
+            Video Vault
+          {:else if page.url.pathname.startsWith('/playbook')}
+            Agency Playbook & SOP
           {:else if page.url.pathname.startsWith('/hq')}
             Virtual HQ 3D
           {:else if page.url.pathname.startsWith('/agents')}
