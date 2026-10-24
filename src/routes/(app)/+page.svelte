@@ -275,7 +275,7 @@
               Distribusi volume aktivitas posting & engagement audiens sepanjang hari (WIB)
             </p>
           </div>
-          <div class="flex items-center gap-2 text-xs sm:text-sm font-mono text-[#7a756f] bg-[#efe9e3] px-3 py-1.5 rounded-lg border border-[#d9cfc7]">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-mono text-[#7a756f] bg-[#efe9e3] px-3 py-1.5 rounded-lg border border-[#d9cfc7] whitespace-nowrap shrink-0">
             <span>Peak:</span>
             <span class="font-bold text-[#8f7556]">{hourlyTelemetry.peakPoint.h}:00 WIB ({hourlyTelemetry.peakPoint.val} index)</span>
           </div>
