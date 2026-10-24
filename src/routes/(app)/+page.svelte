@@ -265,7 +265,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- DIAGRAM 1: 24-Hour Telemetry Area Chart -->
       <div class="lg:col-span-2 bg-[#ffffff] border border-[#d9cfc7] rounded-2xl p-6 sm:p-7 shadow-xs flex flex-col justify-between">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#d9cfc7]/60 pb-3.5">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-[#d9cfc7]/60 pb-3.5">
           <div>
             <h2 class="text-lg sm:text-xl font-bold text-[#2d2b28] flex items-center gap-2.5">
               <TrendingUp size={20} class="text-[#8f7556]" />
