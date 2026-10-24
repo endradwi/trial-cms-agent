@@ -113,7 +113,7 @@
   <!-- Supabase-style Sidebar (ColorHunt Warm Light Palette) -->
   <aside
     class="fixed inset-y-0 left-0 md:static flex flex-col border-r border-[#d9cfc7] bg-[#efe9e3] transition-all duration-200 z-30 shrink-0 {sidebarOpen
-      ? 'w-72 translate-x-0'
+      ? 'w-80 translate-x-0'
       : '-translate-x-full md:translate-x-0 md:w-16'}"
   >
     <!-- Brand / Project Header -->

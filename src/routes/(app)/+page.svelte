@@ -217,7 +217,7 @@
           <span class="text-sm text-[#7a756f] font-normal">({progress.percentage}%)</span>
         </div>
       </div>
-      <div class="w-full bg-[#efe9e3] h-2.5 rounded-full mt-4 overflow-hidden border border-[#d9cfc7]/60">
+      <div class="w-full bg-[#d8d2c5] h-2.5 rounded-full mt-4 overflow-hidden border border-[#c9b59c]/50">
         <div class="bg-gradient-to-r from-emerald-500 to-[#c9b59c] h-full transition-all duration-500" style="width: {progress.percentage}%"></div>
       </div>
       <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
@@ -230,7 +230,7 @@
           <span>BOUNTY SUBMITTED</span>
           <Target size={20} class="text-[#8f7556]" />
         </div>
-        <div class="text-3xl sm:text-4xl font-bold font-mono text-[#8f7556] tracking-tight">
+        <div class="text-3xl sm:text-4xl font-bold font-mono text-[#4a3928] tracking-tight">
           {progress.bountySubmitted} clips
         </div>
       </div>
